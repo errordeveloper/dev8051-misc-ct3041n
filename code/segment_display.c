@@ -105,7 +105,7 @@
    #if ( (FIRST_DIGIT == 4) || (FIRST_DIGIT == 0) )
    #define SHIFTDIR <<
    #elif ( (FIRST_DIGIT == 7) || (FIRST_DIGIT == 3) )
-   #define SHIFTDIT >> 
+   #define SHIFTDIR >> 
    #else
    #warning "In universal method values of first digit other then 7, 4, 3 or 0 require specific direction!"
    #endif
@@ -169,6 +169,7 @@ static const char figure[10] = {
 
 }; /** \} */
 
+
 /** @name The Function to Display a Digit
  *
  * @brief This function takes the array
@@ -176,39 +177,88 @@ static const char figure[10] = {
  * index to write to pins of \ref SEGMENT
  * port. It also selects the right value
  * to pull \ref DIGIT pins depending on
- * configuration of \ref FIRST_DIGIT. */
-/* Firstly let's presume that
-the digit 0 is connected to pin 7.
-There is a clear pattern here:
-switch(d)
-case 0: P0 = 0x80; // 128
-case 1: P0 = 0x40; // 64
-case 2: P0 = 0x20; // 32
-case 3: P0 = 0x16; // 16
+ * configuration of \ref FIRST_DIGIT.
+ *
+ * \arg d digit position (0 to 3)
+ * \arg v value of digit (0 to 9)
+ *
+ * @details Presuming that the digit 0
+ * is connected to pin 7 of \ref DIGIT,
+ * a clear pattern can be identified:
+ *
+ * \code
+ *	 switch(d)
+ *	 {
+ * 		case 0:
+ * 			DIGIT = 0x80; // 10000000 = 128
+ * 		case 1:
+ * 			DIGIT = 0x40; // 01000000 = 64
+ * 		case 2:
+ * 			DIGIT = 0x20; // 00100000 = 32
+ * 		case 3:
+ * 			DIGIT = 0x16; // 00010000 = 16
+ * 		default:
+ * 			DIGIT = 0xff; // Off
+ * 	}
+ * \endcode
+ *
+ * It can be expressed as:
+ *
+ * \code
+ * DIGIT = 128/(2**d)
+ * \endcode
+ *
+ * However, the '**' operator is not valid in C,
+ * and using 'math.h' is not considered
+ * appropriate for this small design.
 
-* It can be expressed as:
-P0 = 128/(2**j)
-'**' operator is not valid in C,
-and using 'math.h' is not cosidered
-appropriate for this small design.
-
-* It is in fact most appropriate
-to use '>>' bitshift operator:
-P0 = (128 >> j);
-
-* However, it turns out that
-the above valuse (128,64,32,16)
-are wrong. We should invert the
-bits.  */
-
-/* More universal but computation-intensive
- * would be: ~( (1<<FIRST_DIGIT) >> d )
- * and ~( (1<<FIRST_DIGIT) << d ) */
-
+ * It is in fact most appropriate to use '>>'
+ * bit-shift operator:
+ *
+ * \code
+ * DIGIT = (128 >> d);
+ * \endcode
+ *
+ * Though, it turns out that the above values
+ * (128, 64, 32, 16) are wrong.
+ * We should invert the bits: 
+ *
+ * \code
+ * DIGIT = ~(128 >> d);
+ * \endcode
+ *
+ * By experiment, two techniques were found.
+ * One uses hard-coded assignments for each
+ * particular predefined pin configuration.
+ * Setting \ref BASIC_METHOD to 1 enables
+ * this technique.
+ *
+ * More universal but computation-intensive
+ * method would be:
+ * 
+ * \code
+ * switch(FIRST_DIGIT)
+ * {
+ *  	case LOWER:
+ *	~( (1<<FIRST_DIGIT) >> d ); break;
+ *  	case UPPER:
+ *	~( (1<<FIRST_DIGIT) << d ); break;
+ * }
+ * \endcode
+ *
+ * The code, in fact, takes advantage of
+ * pre-processor conditional definitions
+ * and uses \ref SHIFTDIR set to '<<' or
+ * '>>' depending what the value of
+ * \ref FIRST_DIGIT is set to. In an
+ * unusual case \ref SHIFTDIR has to
+ * be set manually.
+ *
+*/
 void display_digit(unsigned char d, unsigned char v)
 {
 
-  #ifdef BASIC_METHOD
+  #if BASIC_METHOD
 
    #if ( FIRST_DIGIT == 7 )
    DIGIT = ~( 128 >> d );
@@ -258,6 +308,7 @@ void display_test_loop(unsigned char x)
       for( j=0; j<4; j++ ) {
 
 	display_digit( j, i );
+
       }
 
     }
