@@ -1,8 +1,37 @@
 Emebedded Systems Case Study
 
+For a final year CT3041N module at LMU
+
 A generic project for 8051 microcontroller.
-Designed using MCU 8051 IDE (v1.3.11)
-by Martin Ošmera and Kara Blackowiak.
+Designed using \emph{MCU 8051 IDE (v1.3.11)}
+\cite{sw:mcu8051ide} by \emph{Martin Ošmera}
+and \emph{Kara Blackowiak}.
 
-For a final year CT3041N module at LMU.
+{Foreword Notes}
 
+It had been rather difficult to find
+an appropriate partner for group work,
+therefore all work was done by one
+student.
+
+In order to accomplish the log book
+component of this assessment unit,
+revision control software has been
+utilised. It provides a very appropriate
+facility for logging the programming
+activities and keeps track of code
+modifications. The repository can be
+also stored on the Internet \cite{sw:github}.
+
+The best attempt was made at documenting
+the code, however details were omitted
+for explaining the operation of this very
+commonly used type of circuit.
+
+As mentioned above \emph{MCU 8051 IDE} open-source
+package had been used. \emph{Small Device C Compiler
+(SDCC)} \cite{sw:sdcc} was used to compile the program.
+Git \cite{sw:git} revision control and Doxygen \cite{sw:doxygen}
+documentation generator were of great help for the project.
+
+%% Use \footnote instead of \cite ??

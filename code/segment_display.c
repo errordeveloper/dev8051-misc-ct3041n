@@ -1,60 +1,130 @@
-#include <at89x51.h>
+#if !DOXYGEN /* Real settings. Do not edit other defines. */
+
+/* Configure some options to compile.
+ * Including optimisation and debug.
+*/
+#define TESTING_FUNCTIONS	1
+#define STANDALONE_TEST		1
+#define BASIC_METHOD		0
+
+
+/* Configure which ports LED display is connected to.
+ * Use (P0), (P1), (P2) or (P3).
+*/
+#define DIGIT		(P0)
+#define SEGMENT 	(P1)
+
+/* Set the pin number to which the first
+ * digit (least significant) is connected.
+*/
+#define FIRST_DIGIT		(0)
+
+/* Change the common pin setting.
+ * Use (ANODE) or (CATHODE).
+*/
+#define COMMON_PIN		ANODE
+
+#endif /* End of real settings. Below is documentation. */
 
 /**
- *
+ * @brief This file implements LED digital display driver function.
  * @file segment_display.c
- */
-
-#define TESTING_FUNCTIONS
-#define STANDALONE_TEST
-
-//#define BASIC_METHOD
-
-/** This code has been tested with 4-digit 7-segment multiplexed
- * LED display using GUI emulator.
  *
- * It is inteded to run on MCU with different pin configurations
- * for the connection of LED segments. Using two 8-bit ports
- * up to 8 digits can be driven. There a few precompiler macros
- * to configure the topology of connection. Common cathode or
- * anode options are include, but reverse segment configuration
- * has not been implemented; though, pins for digit selection
- * may be connected in variouse ways.
- */
+ * @details The code has been tested with 4-digit 7-segment
+ * multiplexed LED display using GUI emulator.
+ *
+ * @image html segment_display.png "MCU 8051 IDE Virtual Multiplexed LED Display"
+ *
+ * The software is intended to run on MCU with different pin
+ * configurations for the connection of LED segments. Using
+ * two 8-bit ports up to 8 digits can be driven. There are
+ * a few pre-processor macros to configure the topology of pin
+ * connection. Common cathode or anode options are included,
+ * but reverse segment configuration has not been implemented;
+ * though, pins for digit selection
+ * may be connected in various ways.
+ *
+ *
+*/
 
-#define DIGIT (P0) /**< Set the port for digit selection. */
-#define SEGMENT (P1) /**< Set the port for segment selection. */
+#include <at89x51.h> 
+
+#if DOXYGEN /* These definitions are only for documentation. */
+
+/** \group These macros can be used to switch different parts of code.
+ * \{
+*/
+#define TESTING_FUNCTIONS	[( 0 | 1 )] /**< Include \ref display_test_loop() function. */
+#define STANDALONE_TEST		[( 0 | 1 )] /**< Include \ref main() loop for testing. */
+
+/** There two ways of dealing with the way first digit is connected.
+ * One is faster and can be chosen by setting \ref BASIC_METHOD to 1.
+ * The other method involves an extra bit-shift operation and is more
+ * universal. With the second method \ref SHIFTDIR needs to be defined
+ * only if pins are connected in unusual order.
+ */
+#define BASIC_METHOD		[( 0 | 1 )] /**< Apply faster code for digit selection. */
+
+/** \} */
+
+/** These constants define which ports are in use for LED display.
+ * \{
+*/
+#define DIGIT [( P0 | P1 | P2 | P3 )] /**< Set the port for digit selection. */
+#define SEGMENT [( P0 | P1 | P2 | P3 )] /**< Set the port for segment selection. */
+/** \} */
+
+#endif
 
 /** LED segment displays can be connected
- * with common cathodes or anodes. */
-#define ANODE 1
+ * with common cathodes or anodes.
+ * \{
+*/
+#define COMMON_PIN [( ANODE | CATHODE )]
+
+#define ANODE 1 
 #define CATHODE 0
+/** \} */
 
-/** This code can operate in two pin configuration modes,
- * modifications needed for different combination of these. */
+#if DOXYGEN
+/** This code can operate in four pin configuration modes,
+ * modifications needed for unusual combination of these.
+ *
+ * \{
+*/
+#define SHIFTDIR [( << | >> )] /**< When universal method is used this is set to '<<' or '>>'. */
 
-#define FIRST_DIGIT 0 /**< This can be set to 0 - 7. */
+#define FIRST_DIGIT [( 0 | 3 | 4 | 7 )] /**< This can be set to 0, 3, 4 or 7. Other values require more changes. */
 
-#ifndef BASIC_METHOD
-#warning "Computantionaly intensive universal method will be used!"
+/** \} */
+#endif
+
+#if !BASIC_METHOD
+#warning "Computationally intensive universal method will be used!"
   #ifndef SHIFTDIR
    #if ( (FIRST_DIGIT == 4) || (FIRST_DIGIT == 0) )
    #define SHIFTDIR <<
    #elif ( (FIRST_DIGIT == 7) || (FIRST_DIGIT == 3) )
-   #define SHIFTDIT >>
+   #define SHIFTDIT >> 
    #else
-   #warning "In unversal method values of first digit other then 7, 4, 3 or 0 require specific direction!"
+   #warning "In universal method values of first digit other then 7, 4, 3 or 0 require specific direction!"
    #endif
   #endif
 #endif
 
-/* Configure the macros. */
-#define COMMON_PIN ANODE
-
-
 /** Store a digit code look-up table (array) in ROM,
- * perhaps otherwise an enumeration could be used. */
+ * perhaps otherwise an enumeration could be used.
+ *
+ * There two option for pre-processor to chose from
+ * depending of \ref COMMON_PIN.
+ *
+ *\{
+*/
+#if DOXYGEN
+char figure[10] = {
+#else
 static const char figure[10] = {
+#endif
 
 #ifdef REVERSE_SEGMENTS
 #error "Reverse connection of segments not implemented!"
@@ -91,11 +161,25 @@ static const char figure[10] = {
 
 #endif /* COMMON_PIN */
 
-};
+#if 0
+#define SYM_MINUS
+#define SYM_F
+#define SYM_C
+#endif
 
+}; /** \} */
+
+/** @name The Function to Display a Digit
+ *
+ * @brief This function takes the array
+ * \ref figure and looks-up the code by
+ * index to write to pins of \ref SEGMENT
+ * port. It also selects the right value
+ * to pull \ref DIGIT pins depending on
+ * configuration of \ref FIRST_DIGIT. */
 /* Firstly let's presume that
 the digit 0 is connected to pin 7.
-There is a clear patern here:
+There is a clear pattern here:
 switch(d)
 case 0: P0 = 0x80; // 128
 case 1: P0 = 0x40; // 64
@@ -116,6 +200,10 @@ P0 = (128 >> j);
 the above valuse (128,64,32,16)
 are wrong. We should invert the
 bits.  */
+
+/* More universal but computation-intensive
+ * would be: ~( (1<<FIRST_DIGIT) >> d )
+ * and ~( (1<<FIRST_DIGIT) << d ) */
 
 void display_digit(unsigned char d, unsigned char v)
 {
@@ -139,9 +227,6 @@ void display_digit(unsigned char d, unsigned char v)
    #endif
 
   #else /* GOOD_METHOD_IN_THEORY */
-  /* More universal but computation-intensive
-   * would be: ~( (1<<FIRST_DIGIT) >> d )
-   * and ~( (1<<FIRST_DIGIT) << d ) */
 
   DIGIT = ~( (1<<FIRST_DIGIT) SHIFTDIR d );
 
@@ -151,11 +236,20 @@ void display_digit(unsigned char d, unsigned char v)
 
 }
 
-#ifdef TESTING_FUNCTIONS
+/** @name Display Test Loop
+ *
+ * @brief This is a scrolling loop
+ * intended for display hardware
+ * tests and basic demo. It can be
+ * disabled by setting constant
+ * \ref TESTING_FUNCTIONS to 0.
+ *
+*/
+#if TESTING_FUNCTIONS
 void display_test_loop(unsigned char x)
 {
 
-  int i, j;
+  short unsigned int i, j;
 
   while(x--) {
 
@@ -173,7 +267,15 @@ void display_test_loop(unsigned char x)
 }
 #endif
 
-#ifdef STANDALONE_TEST
+
+/** @name Standalone Testing Function
+ *
+ * @brief The main() function is only
+ * compiled when \ref STANDALONE_TEST
+ * is set to 1.
+ *
+*/
+#if STANDALONE_TEST || DOXYGEN
 void main (void)
 {
 
@@ -182,3 +284,6 @@ void main (void)
 
 }
 #endif
+
+/** \} */
+/** EOF */
