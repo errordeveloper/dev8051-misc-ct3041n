@@ -295,7 +295,7 @@ void display_digit(unsigned char d, unsigned char v)
  * \ref TESTING_FUNCTIONS to 0.
  *
 */
-#if TESTING_FUNCTIONS
+#if TESTING_FUNCTIONS || DOXYGEN
 void display_test_loop(unsigned char x)
 {
 

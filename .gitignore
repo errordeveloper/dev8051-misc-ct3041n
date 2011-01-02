@@ -12,3 +12,5 @@
 *.rst
 *.sym
 *.bak
+
+code/temp/*
