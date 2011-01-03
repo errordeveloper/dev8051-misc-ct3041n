@@ -1,31 +1,3 @@
-#if !DOXYGEN /* Real settings. Do not edit other defines. */
-
-/* Configure some options to compile.
- * Including optimisation and debug.
-*/
-#define TESTING_FUNCTIONS	1
-#define STANDALONE_TEST		1
-#define BASIC_METHOD		0
-
-
-/* Configure which ports LED display is connected to.
- * Use (P0), (P1), (P2) or (P3).
-*/
-#define DIGIT		(P0)
-#define SEGMENT 	(P1)
-
-/* Set the pin number to which the first
- * digit (least significant) is connected.
-*/
-#define FIRST_DIGIT		(0)
-
-/* Change the common pin setting.
- * Use (ANODE) or (CATHODE).
-*/
-#define COMMON_PIN		ANODE
-
-#endif /* End of real settings. Below is documentation. */
-
 /**
  * @brief This file implements LED digital display driver function.
  * @file segment_display.c
@@ -45,6 +17,7 @@
  * though, pins for digit selection
  * may be connected in various ways.
  *
+ * @author Ilya Dmitrichenko <errordeveloper@gmail.com>
  *
 */
 
@@ -53,6 +26,8 @@
 #else
 #include <reg51.h>
 #endif
+
+#include "settings.h"
 
 #if DOXYGEN /* These definitions are only for documentation. */
 
@@ -310,6 +285,8 @@ void display_test_loop(unsigned char x)
 
   short unsigned int i, j;
 
+/** Scroll full count x times.
+*/
   while(x--) {
 
     for( i=0; i<10; i++ ) {
@@ -328,6 +305,7 @@ void display_test_loop(unsigned char x)
 #endif
 
 
+#ifndef MAIN_PROGRAM
 /** @name Standalone Testing Function
  *
  * @brief The main() function is only
@@ -339,10 +317,13 @@ void display_test_loop(unsigned char x)
 void main (void)
 {
 
+/** Run display_test_loop() 2 times.
+*/
   display_test_loop(2);
   DIGIT = 0xff;
 
 }
+#endif
 #endif
 
 /** \} */

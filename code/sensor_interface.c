@@ -1,20 +1,3 @@
-#if !DOXYGEN /* Real settings. Do not edit other defines. */
-
-/* Configure some options to compile.
- * Including optimisation and debug.
-*/
-#define TESTING_FUNCTIONS	1
-#define STANDALONE_TEST		1
-
-/* Configure which ports DS1620 sensor is connected to.
- * Use (P0), (P1), (P2) or (P3).
-*/
-#define TS_DATA		(P2_0)
-#define TS_CLOCK	(P2_1)
-#define TS_RESET 	(P2_2)
-
-#endif /* End of real settings. Below is documentation. */
-
 /**
  * @brief This file implements \c DS1620 digital temperature
  * sensor driver functions and macros.
@@ -42,6 +25,8 @@
  * -	http://datasheets.maxim-ic.com/en/ds/DS1620.pdf
  * .
  *
+ * @author Ilya Dmitrichenko <errordeveloper@gmail.com>
+ *
 */
 
 #ifdef SDCC
@@ -49,6 +34,9 @@
 #else
 #include <reg51.h>
 #endif
+
+#include "settings.h"
+
 /** \name DS1620 Commands
  * \{
  * 
@@ -228,7 +216,7 @@ void tsc( char byte )
  *
  * digraph G {
  *
- * node [style=filled, fontname=Free Sans, fontsize=8];
+ * node [style=filled, fontname="Free Sans", fontsize=8];
  *
  * fontname="Free Sans", fontsize=9;
  * label = "Write 8-bit command to DS1620";
@@ -340,7 +328,7 @@ int tsq( unsigned char mode, int data )
  *
  * digraph G {
  *
- *	node [style=filled, fontname=Free Sans, fontsize=8];
+ *	node [style=filled, fontname="Free Sans", fontsize=8];
  *
  *	fontname="Free Sans", fontsize=9;
  *	label = "Read 9-bit data from DS1620";
@@ -534,97 +522,6 @@ int tsq( unsigned char mode, int data )
   return 0;
 }
 
-#ifdef EXTRA_FUNCTIONS
-/** @name This function read the value of configuration register.
- * \returns data stored in the configuration register of \c DS1620
- * @details It first pulls the \ref TS_RESET pin high and then
- * sends \ref READ_CONF command, reads the \ref TS_DATA pin for
- * next 8 cycles and pulls \ref TS_RESET returning read value.
- *
-*/
-unsigned int ts_config_read( void )
-{
-
-  unsigned char conf_data = 0;
-  unsigned char conf_read = 0;
-  char n;
-
-  TS_START();
-
-  ts_write( READ_CONF, 0 );
-
-  /* Change pin mode to hi-z for input reading */
-
-  TS_DATA = 1;
-
-  for( n = 0; n < 8; n++ ) {
-
-    TS_CLOCK = 0;
-
-    read = TS_DATA;
-
-    TS_CLOCK = 1;
-
-    conf_data = conf_data | conf_read << n;
-
-  }
-
-  /* Change pin mode to output */
-
-  TS_DATA = 0;
-
-  TS_STOP();
-
-  return ( conf_data );
-
-}
-
-/** @name Write data to the configuration register
- * \retval 0 Write successful
- * \retval 1 Write verification failed
- * \retval 2 Wrong input data content
- * @details It first pulls the \ref TS_RESET pin high and then
- * sends \ref WRITE_CONF command, reads the \ref TS_DATA pin for
- * next 8 cycles and pulls \ref TS_RESET returning an error code.
- * A delay of 10 ms (\ref WRITE_DELAY) is used to wait for sensor
- * to register new configuration. Basic error check is performed. 
- *
-*/
-char ts_config_write( unsigned char conf_data )
-{
-
-  if( conf_data > 0 ) {
-
-    TS_START();
-
-    ts_write( WRITE_CONF, 0 );
-
-    ts_write( conf_data, 0 );
-
-    /* It may take up to 10 ms */
-    ts_wait();
-
-    TS_STOP();
-
-    if( ts_config_read() == conf_data ) {
-
-      return 0;
-
-    } else {
-
-      return 1;
-
-    }
-
-  } else {
-
-    return 2;
-
-  }
-
-
-}
-#endif /* EXTRA_FUNCTIONS */
 
 /** @name Sensor Test Loop
  *
@@ -649,6 +546,7 @@ void sensor_test_loop(unsigned char x)
 }
 #endif
 
+#ifndef MAIN_PROGRAM
 /** @name Standalone Testing Function
  *
  * @brief The \c main() function is only
@@ -665,4 +563,5 @@ void main (void)
   sensor_test_loop(2);
 
 }
+#endif
 #endif
