@@ -34,6 +34,7 @@
  * multiplexed LED display using GUI emulator.
  *
  * @image html segment_display.png "MCU 8051 IDE Virtual Multiplexed LED Display"
+ * @image katex segment_display.png "MCU 8051 IDE Virtual Multiplexed LED Display"
  *
  * The software is intended to run on MCU with different pin
  * configurations for the connection of LED segments. Using
@@ -47,15 +48,22 @@
  *
 */
 
-#include <at89x51.h> 
+#ifdef SDCC
+#include <at89x51.h>
+#else
+#include <reg51.h>
+#endif
 
 #if DOXYGEN /* These definitions are only for documentation. */
 
-/** \group These macros can be used to switch different parts of code.
+/** @name Software Configuration
+ * These macros can be used to switch different parts of code.
  * \{
 */
-#define TESTING_FUNCTIONS	[( 0 | 1 )] /**< Include \ref display_test_loop() function. */
-#define STANDALONE_TEST		[( 0 | 1 )] /**< Include \ref main() loop for testing. */
+/** @brief Include \ref display_test_loop() function. */
+#define TESTING_FUNCTIONS	[( 0 | 1 )]
+/** @brief Include \ref main() loop for testing. */
+#define STANDALONE_TEST		[( 0 | 1 )]
 
 /** There two ways of dealing with the way first digit is connected.
  * One is faster and can be chosen by setting \ref BASIC_METHOD to 1.
@@ -67,14 +75,13 @@
 
 /** \} */
 
-/** These constants define which ports are in use for LED display.
+/** @name LED Interface Pins
+ * These constants define which ports are in use for LED display.
  * \{
 */
 #define DIGIT [( P0 | P1 | P2 | P3 )] /**< Set the port for digit selection. */
 #define SEGMENT [( P0 | P1 | P2 | P3 )] /**< Set the port for segment selection. */
 /** \} */
-
-#endif
 
 /** LED segment displays can be connected
  * with common cathodes or anodes.
@@ -82,7 +89,9 @@
 */
 #define COMMON_PIN [( ANODE | CATHODE )]
 
-#define ANODE 1 
+#endif /* DOXYGEN */
+
+#define ANODE 1
 #define CATHODE 0
 /** \} */
 
