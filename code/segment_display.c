@@ -1,5 +1,5 @@
 /**
- * @brief This file implements LED digital display driver function.
+ * @brief This file implements LED digital display driver.
  * @file segment_display.c
  *
  * @details The code has been tested with 4-digit 7-segment
@@ -101,13 +101,15 @@
  *
  * There two option for pre-processor to chose from
  * depending of \ref COMMON_PIN.
+ * 
+ * Index 10, 11 and 12 are used for '-', 'C' and 'F'.
  *
  *\{
 */
 #if DOXYGEN
-char figure[10] = {
+char figure[12] = {
 #else
-static const char figure[10] = {
+static const char figure[12] = {
 #endif
 
 #ifdef REVERSE_SEGMENTS
@@ -125,7 +127,10 @@ static const char figure[10] = {
   0x82, // = 6
   0xF8, // = 7
   0x80, // = 8
-  0x90  // = 9
+  0x90, // = 9
+  0xbf, // = -
+  0xc6, // = C
+  0x8e  // = F
 
 #else /* COMMON_PIN == CATHODE */
 
@@ -138,17 +143,17 @@ static const char figure[10] = {
   0x75, // = 6
   0x07, // = 7
   0x7f, // = 8
-  0x6f  // = 9
-
-// 0x39 // = C
-// 0x71 // = F
+  0x6f, // = 9
+  0x40, // = -
+  0x39, // = C
+  0x71  // = F
 
 #endif /* COMMON_PIN */
 
-#if 0
-#define SYM_MINUS
-#define SYM_F
-#define SYM_C
+#if !DOXYGEN
+#define SYM_MINUS 10
+#define SYM_C 11
+#define SYM_F 12
 #endif
 
 }; /** \} */
@@ -239,7 +244,7 @@ static const char figure[10] = {
  * be set manually.
  *
 */
-void display_digit(unsigned char d, unsigned char v)
+static void display_digit( unsigned char d, unsigned char v )
 {
 
   #if BASIC_METHOD
@@ -270,6 +275,59 @@ void display_digit(unsigned char d, unsigned char v)
 
 }
 
+/** @name
+ * @brief
+ *
+ * @note There is no boundary checking,
+ * therefore the value of the argument
+ * has to fit between -999 and 9999.
+ *
+*/
+void display_number( int x )
+{
+
+#define REM(X, Y) X/Y; X %= Y
+
+  char n[4], i;
+
+  if( x >= 0 ) {
+
+  n[3] = REM(x, 1000);
+
+  n[2] = REM(x, 100);
+
+  n[1] = REM(x, 10);
+
+  n[0] = x;
+
+  } else {
+
+  x *= -1;
+
+  n[3] = SYM_MINUS;
+
+  n[2] = REM(x, 100);
+
+  n[1] = REM(x, 10);
+
+  n[0] = x;
+
+  }
+
+  for( i = 3; i < -1; i-- ) {
+
+  if( n[i] == 0 )
+
+  }
+
+  for( i = 0; i < 4; i++ ) {
+
+    display_digit( i, n[i] );
+
+  }
+
+}
+
 /** @name Display Test Loop
  *
  * @brief This is a scrolling loop
@@ -280,7 +338,7 @@ void display_digit(unsigned char d, unsigned char v)
  *
 */
 #if TESTING_FUNCTIONS || DOXYGEN
-void display_test_loop(unsigned char x)
+void display_test_loop( unsigned char x )
 {
 
   short unsigned int i, j;
@@ -319,8 +377,10 @@ void main (void)
 
 /** Run display_test_loop() 2 times.
 */
-  display_test_loop(2);
-  DIGIT = 0xff;
+  //display_test_loop(2);
+  //DIGIT = 0xff;
+
+  display_number(76);
 
 }
 #endif

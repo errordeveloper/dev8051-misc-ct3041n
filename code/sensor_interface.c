@@ -1,6 +1,6 @@
 /**
  * @brief This file implements \c DS1620 digital temperature
- * sensor driver functions and macros.
+ * sensor driver.
  *
  * The information had been extracted from datasheets and 
  * code examples. The objective is to implement 3-wire
@@ -161,7 +161,7 @@ short int temp = 0; /**< Gloabal temperature variable. */
  * \endcode
  *
 */
-void ts_wait(void)
+static void ts_wait( void )
 {
 #ifdef USE_ASM_TS_WAIT
 
@@ -208,7 +208,7 @@ INLINE_ASM_END_KEYWORD
  * \endcode
  *
 */
-void tsc( char byte )
+static void tsc( char byte )
 {
 
 /**
@@ -265,7 +265,7 @@ void tsc( char byte )
  * that is needed is tsc().
  * 
 */
-int tsq( unsigned char mode, int data )
+static int tsq( unsigned char mode, int data )
 {
 
   char n; int read = 0;
@@ -522,6 +522,31 @@ int tsq( unsigned char mode, int data )
   return 0;
 }
 
+/** @name Temperature Sensor Setup
+ *
+ * @brief Basic setup function
+ * using TS_SETUP() macro.
+ *
+*/
+void sensor_setup( void )
+{
+
+  TS_SETUP();
+
+}
+
+/** @name Temperature Sensor Read
+ *
+ * @brief Basic read function
+ * for data acquisition.
+ *
+*/
+int sensor_read( void )
+{
+
+  return tsq(READ_TEMP,0);
+
+}
 
 /** @name Sensor Test Loop
  *
@@ -532,7 +557,7 @@ int tsq( unsigned char mode, int data )
  *
 */
 #if TESTING_FUNCTIONS || DOXYGEN
-void sensor_test_loop(unsigned char x)
+void sensor_test_loop( unsigned char x )
 {
 
   while(x--) {
