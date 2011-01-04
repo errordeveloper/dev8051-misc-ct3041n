@@ -6,7 +6,7 @@
  * multiplexed LED display using GUI emulator.
  *
  * @image html segment_display.png "MCU 8051 IDE Virtual Multiplexed LED Display"
- * @image katex segment_display.png "MCU 8051 IDE Virtual Multiplexed LED Display"
+ * @image latex segment_display.png "MCU 8051 IDE Virtual Multiplexed LED Display"
  *
  * The software is intended to run on MCU with different pin
  * configurations for the connection of LED segments. Using
@@ -16,6 +16,16 @@
  * but reverse segment configuration has not been implemented;
  * though, pins for digit selection
  * may be connected in various ways.
+ *
+ * @note DISPLAY_HOLD() is not implemented. It requires
+ * testing with real LED display in order to determin
+ * the hold time period, which depends on fade-out
+ * time of real LED display.
+ 
+ * @note Therefore the display_digit() function turns
+ * the segments off in order to prevent effect of moving
+ * digit. The function display_number() uses second
+ * argument to sepcify number of cycles.
  *
  * @author Ilya Dmitrichenko <errordeveloper@gmail.com>
  *
@@ -101,7 +111,7 @@
  *
  * There two option for pre-processor to chose from
  * depending of \ref COMMON_PIN.
- * 
+ *
  * Index 10, 11 and 12 are used for '-', 'C' and 'F'.
  *
  *\{
@@ -168,10 +178,14 @@ static const char figure[12] = {
  * to pull \ref DIGIT pins depending on
  * configuration of \ref FIRST_DIGIT.
  *
- * \arg d digit position (0 to 3)
- * \arg v value of digit (0 to 9)
+ * @param d digit position (0 to 3)
+ * @param v value of digit (0 to 9)
  *
- * @details Presuming that the digit 0
+*/
+void display_digit( unsigned char d, unsigned char v )
+{
+
+/** @details Presuming that the digit 0
  * is connected to pin 7 of \ref DIGIT,
  * a clear pattern can be identified:
  *
@@ -244,8 +258,8 @@ static const char figure[12] = {
  * be set manually.
  *
 */
-static void display_digit( unsigned char d, unsigned char v )
-{
+
+  SEGMENT = figure[v];
 
   #if BASIC_METHOD
 
@@ -271,32 +285,50 @@ static void display_digit( unsigned char d, unsigned char v )
 
   #endif
 
-  SEGMENT = figure[v];
-
 }
 
-/** @name
- * @brief
+/** @name The Function to Display a Number
+ * @brief This function calls display_digit()
+ *
+ * @param x number to display (-999 to 9999)
+ * @param t number of refresh cycles
+ *
+ * @details It uses an extra array for
+ * marking which digit should be OFF
+ * in case if it is zero and there no
+ * other digit in front of it.
+ * It could probably use a 4-bit mask.
  *
  * @note There is no boundary checking,
  * therefore the value of the argument
- * has to fit between -999 and 9999.
- *
+ * should be between -999 and 9999.
+ * It was considered not appropriate
+ * to implement fixed decimal point.
 */
-void display_number( int x )
+void display_number( int x, unsigned int t )
 {
 
+#ifndef DOXYGEN
 #define REM(X, Y) X/Y; X %= Y
+#endif
 
-  char n[4], i;
-
+  char n[4], m[4] = {1, 1, 1, 1}, i;
+  /** Determin the value of each
+   * decimal place by using int
+   * division and remainder.
+   *
+  */
   if( x >= 0 ) {
 
   n[3] = REM(x, 1000);
+  if( n[3] == 0 )
+   m[3] = 0;
 
   n[2] = REM(x, 100);
+  if( n[2] == 0 && m[3] == 0 ) m[2] = 0;
 
   n[1] = REM(x, 10);
+  if( n[1] == 0 && m[2] == 0 ) m[1] = 0;
 
   n[0] = x;
 
@@ -307,22 +339,29 @@ void display_number( int x )
   n[3] = SYM_MINUS;
 
   n[2] = REM(x, 100);
+  if( n[2] == 0 ) m[2] = 0;
 
   n[1] = REM(x, 10);
+  if( n[1] == 0 && m[2] == 0 ) m[1] = 0;
 
   n[0] = x;
 
   }
+  /** Repeat for t times. */
+  while(t--) {
 
-  for( i = 3; i < -1; i-- ) {
+    for( i = 0; i < 4; i++ ) {
+      /** If a digit is zero the it
+       * it is not displayed, unless
+       * there is a non-zero digit
+       * in from of it.
+       *
+      */
+      if( m[i] ) display_digit( i, n[i] );
+      /* DISPLAY_HOLD(); */
+      DIGIT = 0xff;
 
-  if( n[i] == 0 )
-
-  }
-
-  for( i = 0; i < 4; i++ ) {
-
-    display_digit( i, n[i] );
+    }
 
   }
 
@@ -338,14 +377,14 @@ void display_number( int x )
  *
 */
 #if TESTING_FUNCTIONS || DOXYGEN
-void display_test_loop( unsigned char x )
+void display_test_loop( unsigned char t )
 {
 
   short unsigned int i, j;
 
-/** Scroll full count x times.
+/** Scroll full count t times.
 */
-  while(x--) {
+  while(t--) {
 
     for( i=0; i<10; i++ ) {
 
@@ -380,7 +419,9 @@ void main (void)
   //display_test_loop(2);
   //DIGIT = 0xff;
 
-  display_number(76);
+  display_number(-768, 20);
+  display_number(1769, 20);
+  display_number(2761, 20);
 
 }
 #endif

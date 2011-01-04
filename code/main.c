@@ -6,9 +6,9 @@
 
 /** \mainpage Emebedded Systems Case Study
  *
- * For a final year CT3041N module at LMU
- * 
- * A generic project for \e Intel \c 8051 microcontroller.
+ * For a final year CT3041N module at LMU -
+ * a generic project for \e Intel \c 8051 microcontroller.
+ *
  * Designed using <i>MCU 8051 IDE (v1.3.11)</i>
  * by <i>Martin Ošmera</i> and <i>Kara Blackowiak</i>.
  * <i>

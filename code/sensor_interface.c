@@ -161,7 +161,7 @@ short int temp = 0; /**< Gloabal temperature variable. */
  * \endcode
  *
 */
-static void ts_wait( void )
+void ts_wait( void )
 {
 #ifdef USE_ASM_TS_WAIT
 
@@ -208,7 +208,7 @@ INLINE_ASM_END_KEYWORD
  * \endcode
  *
 */
-static void tsc( char byte )
+void tsc( char byte )
 {
 
 /**
@@ -265,7 +265,7 @@ static void tsc( char byte )
  * that is needed is tsc().
  * 
 */
-static int tsq( unsigned char mode, int data )
+int tsq( unsigned char mode, int data )
 {
 
   char n; int read = 0;
