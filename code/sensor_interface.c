@@ -29,6 +29,8 @@
  *
 */
 
+/* Doxygen tagged comments were stripped. */
+
 #ifdef SDCC
 #include <at89x51.h>
 #else
@@ -36,6 +38,7 @@
 #endif
 
 #include "settings.h"
+#include "prototypes.h"
 
 /** \name DS1620 Commands
  * \{
@@ -90,7 +93,7 @@
  * These macros can be used to switch different parts of code.
  * \{
 */
-/** @brief Include \ref display_test_loop() function. */
+/** @brief Include \ref sensor_test_loop() function. */
 #define TESTING_FUNCTIONS	[( 0 | 1 )]
 /** @brief Include \ref main() loop for testing. */
 #define STANDALONE_TEST		[( 0 | 1 )]
@@ -124,8 +127,13 @@
  * and then \ref TS_RESET high. */
 #define TS_START() TS_RESET = 0; TS_CLOCK = 1; TS_RESET = 1
 /** @brief Basic DS1620 setup macro example */
-#define TS_SETUP() tcq(WRITE_TL, 15); tcq(WRITE_TH, 30); \
-		   tcq(WRITE_CONF, TS_CONF); tcq(RUN_CONV, 0)
+//#if DOXYGEN
+#define TS_SETUP() \
+tsq(WRITE_TL, 15); \
+tsq(WRITE_TH, 30); \
+tsq(WRITE_CONF, TS_CONF); \
+tsq(RUN_CONV, 0)
+//#endif
 
 /* #define TS_WAIT() */
 
@@ -200,7 +208,7 @@ INLINE_ASM_END_KEYWORD
 /** @name Temperature Sensor Command
  * \param byte - 8-bit command to write.
  * @details Writes a command byte (bit-by-bit) to the
- * \ref TS_DATA pin, applying \ref TS_TICK after
+ * \ref TS_DATA pin, applying \ref TS_TICK() after
  * each bit. Code line below performs the
  * \c "shift-right-AND-mask" operation.
  * \code
@@ -525,12 +533,13 @@ int tsq( unsigned char mode, int data )
 /** @name Temperature Sensor Setup
  *
  * @brief Basic setup function
- * using TS_SETUP() macro.
  *
 */
 void sensor_setup( void )
 {
 
+/** Use TS_SETUP() macro.
+*/
   TS_SETUP();
 
 }
@@ -544,6 +553,11 @@ void sensor_setup( void )
 int sensor_read( void )
 {
 
+/** Use tsq() to send READ_TEMP
+ * command and 0 as the data
+ * value to specify 'read' mode.
+ *
+*/
   return tsq(READ_TEMP,0);
 
 }

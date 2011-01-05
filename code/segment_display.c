@@ -38,6 +38,7 @@
 #endif
 
 #include "settings.h"
+#include "prototypes.h"
 
 #if DOXYGEN /* These definitions are only for documentation. */
 
@@ -117,9 +118,9 @@
  *\{
 */
 #if DOXYGEN
-char figure[12] = {
+char figure[13] = {
 #else
-static const char figure[12] = {
+static const char figure[13] = {
 #endif
 
 #ifdef REVERSE_SEGMENTS
@@ -276,7 +277,7 @@ void display_digit( unsigned char d, unsigned char v )
    DIGIT = ~( 1 << d );
 
    #else
-   #warning "In basic method each values of first digit can be 7, 4, 3 or 0 only!"
+   #warning "In basic method values of first digit can be 7, 4, 3 or 0 only!"
    #endif
 
   #else /* GOOD_METHOD_IN_THEORY */
@@ -298,6 +299,7 @@ void display_digit( unsigned char d, unsigned char v )
  * in case if it is zero and there no
  * other digit in front of it.
  * It could probably use a 4-bit mask.
+ * Bit arrays are not allowed by SDCC.
  *
  * @note There is no boundary checking,
  * therefore the value of the argument

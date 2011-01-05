@@ -4,6 +4,8 @@
  *
 */
 
+/* Doxygen tagged comments were stripped. */
+
 /** \mainpage Emebedded Systems Case Study
  *
  * For a final year CT3041N module at LMU -
@@ -45,7 +47,7 @@
  * The best attempt was made at documenting
  * the code, however details were omitted
  * for explaining the operation of this very
- * commonly used type of circuit.
+ * commonly microcontroller used type of circuit.
  * 
  * As mentioned above <i>MCU 8051 IDE</i> open-source
  * package had been used to test the code in the
@@ -58,6 +60,20 @@
  * - Git Homepage - http://git-scm.com/
  * .
  * </i>
+ *
+ * <b>Introduction Notes</b>
+ *
+ * This report document details the implementation
+ * by describing each of source code files.
+ * The description is fallowed by listing of the
+ * source code itself. Please note that tagged
+ * comments used for description were stripped
+ * from the listings. The pre-processor condition
+ * statements relying on definition 'DOXYGEN' constant
+ * symbol are not to be used by the compiler.
+ *
+ * <i>Please also note that the code assumes C89
+ * or C99 ISO standard compiler.</i>
  * 
 */
 
@@ -68,6 +84,7 @@
 #endif
 
 #include "settings.h"
+#include "prototypes.h"
 
 void main ( void )
 {
@@ -75,5 +92,20 @@ void main ( void )
   /** Initialise the DS1620 sensor
    * by writing high and low trigger
    * values and enable MCU mode
+   * using sensor_setup().
+   *
   */
+  sensor_setup();
+
+  /** Infinite loop is a common
+   * element of an embedded
+   * proram, it will not exit
+   * until the MCU powered-off.
+   *
+  */
+  while(1) {
+
+    display_number(sensor_read);
+  }
+
 }

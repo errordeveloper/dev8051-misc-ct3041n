@@ -12,7 +12,8 @@
 */
 
 #if !DOXYGEN
-//#define MAIN_PROGRAM
+
+#define MAIN_PROGRAM
 
 /* Configure some options to compile.
  * Including optimisation and debug.
