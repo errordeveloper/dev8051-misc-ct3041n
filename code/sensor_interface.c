@@ -12,7 +12,10 @@
  *
  * @file sensor_interface.c
  *
- * @image html sensor_function_block_diagram.gif "DS1620 Digital Thermometer and Thermostat (function block diagram)"
+ * @image html sensor_function_block_diagram.png "DS1620 Digital Thermometer and Thermostat (function block diagram)"
+ * @image html sensor_interface.png "Virtual DS1620 in MCU 8051 IDE"
+ * @image latex sensor_function_block_diagram.png "DS1620 Digital Thermometer and Thermostat (function block diagram)"
+ * @image latex sensor_interface.png "Virtual DS1620 in MCU 8051 IDE"
  *
  * Some code has been borrowed from \c DS1620 Arduino C++ Library:
  * -	https://github.com/thinkhole/Arduino-DS1620/blob/master/ds1620.cpp

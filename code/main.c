@@ -68,9 +68,9 @@
  * The description is fallowed by listing of the
  * source code itself. Please note that tagged
  * comments used for description were stripped
- * from the listings. The pre-processor condition
- * statements relying on definition 'DOXYGEN' constant
- * symbol are not to be used by the compiler.
+ * from the listings. The code under pre-processor
+ * condition statements relying on definition of
+ * 'DOXYGEN' symbol is not to be used by the compiler.
  *
  * <i>Please also note that the code assumes C89
  * or C99 ISO standard compiler.</i>
@@ -99,13 +99,16 @@ void main ( void )
 
   /** Infinite loop is a common
    * element of an embedded
-   * proram, it will not exit
-   * until the MCU powered-off.
+   * program, it will not exit
+   * until the MCU powers-off.
    *
   */
   while(1) {
 
-    display_number(sensor_read);
+    display_number( sensor_read() );
+
+    /* READ_DELAY(); */
+
   }
 
 }
