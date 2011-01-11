@@ -1,0 +1,45 @@
+\section{main.c File Reference}
+\label{main_8c}\index{main.c@{main.c}}
+
+
+Main Program.  
+
+
+{\ttfamily \#include $<$at89x51.h$>$}\par
+{\ttfamily \#include \char`\"{}settings.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}prototypes.h\char`\"{}}\par
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void {\bf main} (void)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Main Program. \begin{DoxyAuthor}{Author}
+Ilya Dmitrichenko $<${\tt errordeveloper@gmail.com}$>$ 
+\end{DoxyAuthor}
+
+
+Definition in file {\bf main.c}.
+
+
+
+\subsection{Function Documentation}
+\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}void main (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{main_8c_a6288eba0f8e8ad3ab1544ad731eb7667}
+
+
+Initialise the DS1620 sensor by writing high and low trigger values and enable MCU mode using \doxyref{sensor\_\-setup()}{p.}{sensor__interface_8c_ac4703fb2180cef6e9c87637e5c837c88}.
+
+Infinite loop is a common element of an embedded program, it will not exit until the MCU powers-\/off.
+
+
+
+Definition at line {\bf 89} of file {\bf main.c}.
+

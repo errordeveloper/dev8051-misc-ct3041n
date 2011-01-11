@@ -1,0 +1,26 @@
+\section{prototypes.h}
+
+\begin{DoxyCode}
+00001 
+00006 \textcolor{preprocessor}{#if !DOXYGEN}
+00007 \textcolor{preprocessor}{}
+00012 \textcolor{keywordtype}{void}    ts_wait( \textcolor{keywordtype}{void} );
+00013 
+00014 \textcolor{keywordtype}{void}    tsc( \textcolor{keywordtype}{char} byte );
+00015 
+00016 \textcolor{keywordtype}{int}     tsq( \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} mode, \textcolor{keywordtype}{int} data );
+00017 
+00018 \textcolor{keywordtype}{void}    sensor_setup( \textcolor{keywordtype}{void} );
+00019 
+00020 \textcolor{keywordtype}{int}     sensor_read( \textcolor{keywordtype}{void} );
+00021 
+00022 \textcolor{keywordtype}{void}    sensor_test_loop( \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} x );
+00023 
+00030 \textcolor{keywordtype}{void} display_digit( \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} d, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} v );
+00031 
+00032 \textcolor{keywordtype}{void} display_number( \textcolor{keywordtype}{int} x, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t );
+00033 
+00034 \textcolor{keywordtype}{void} display_test_loop( \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} t );
+00035 
+00038 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

@@ -1,0 +1,302 @@
+\section{sensor\_\-interface.c}
+
+\begin{DoxyCode}
+00001 
+00035 \textcolor{comment}{/* Doxygen tagged comments were stripped. */}
+00036 
+00037 \textcolor{preprocessor}{#ifdef SDCC}
+00038 \textcolor{preprocessor}{}\textcolor{preprocessor}{#include <at89x51.h>}
+00039 \textcolor{preprocessor}{#else}
+00040 \textcolor{preprocessor}{}\textcolor{preprocessor}{#include <reg51.h>}
+00041 \textcolor{preprocessor}{#endif}
+00042 \textcolor{preprocessor}{}
+00043 \textcolor{preprocessor}{#include "settings.h"}
+00044 \textcolor{preprocessor}{#include "prototypes.h"}
+00045 
+00052 \textcolor{preprocessor}{#define READ\_TEMP  0xAA         }
+00053 \textcolor{preprocessor}{}
+00054 \textcolor{preprocessor}{#define WRITE\_TH   0x01}
+00055 \textcolor{preprocessor}{}
+00056 \textcolor{preprocessor}{#define WRITE\_TL   0x02 }
+00057 \textcolor{preprocessor}{}
+00058 \textcolor{preprocessor}{#define READ\_TH    0xA1 }
+00059 \textcolor{preprocessor}{}
+00060 \textcolor{preprocessor}{#define READ\_TL    0xA2 }
+00061 \textcolor{preprocessor}{}
+00062 \textcolor{preprocessor}{#define READ\_COUNT 0xA0 }
+00063 \textcolor{preprocessor}{}
+00064 \textcolor{preprocessor}{#define READ\_SLOPE 0xA9 }
+00065 \textcolor{preprocessor}{}
+00066 \textcolor{preprocessor}{#define RUN\_CONV 0xEE   }
+00067 \textcolor{preprocessor}{}
+00068 \textcolor{preprocessor}{#define END\_CONV  0x22  }
+00069 \textcolor{preprocessor}{}
+00070 \textcolor{preprocessor}{#define WRITE\_CONF 0x0C }
+00071 \textcolor{preprocessor}{}
+00072 \textcolor{preprocessor}{#define READ\_CONF  0xAC }
+00073 \textcolor{preprocessor}{}
+00074 \textcolor{preprocessor}{#define TEST 0x00}
+00075 \textcolor{preprocessor}{}
+00087 \textcolor{preprocessor}{#define WRITE\_DELAY 20  }
+00088 \textcolor{preprocessor}{}
+00090 \textcolor{preprocessor}{#define TS\_CONF 10}
+00091 \textcolor{preprocessor}{}
+00093 \textcolor{preprocessor}{#if DOXYGEN}
+00094 \textcolor{preprocessor}{}
+00100 \textcolor{preprocessor}{#define TESTING\_FUNCTIONS       [( 0 | 1 )]}
+00101 \textcolor{preprocessor}{}
+00102 \textcolor{preprocessor}{#define STANDALONE\_TEST         [( 0 | 1 )]}
+00103 \textcolor{preprocessor}{}
+00111 \textcolor{preprocessor}{#define TS\_DATA  [( P0 | P1 | P2 | P3 )]}
+00112 \textcolor{preprocessor}{}
+00113 \textcolor{preprocessor}{#define TS\_CLOCK [( P0 | P1 | P2 | P3 )]}
+00114 \textcolor{preprocessor}{}
+00115 \textcolor{preprocessor}{#define TS\_RESET [( P0 | P1 | P2 | P3 )]}
+00116 \textcolor{preprocessor}{}
+00118 \textcolor{preprocessor}{#endif}
+00119 \textcolor{preprocessor}{}
+00125 \textcolor{preprocessor}{#define TS\_TICK() TS\_CLOCK = 0; TS\_CLOCK = 1}
+00126 \textcolor{preprocessor}{}
+00127 \textcolor{preprocessor}{#define TS\_STOP() TS\_RESET = 0}
+00128 \textcolor{preprocessor}{}
+00131 \textcolor{preprocessor}{#define TS\_START() TS\_RESET = 0; TS\_CLOCK = 1; TS\_RESET = 1}
+00132 \textcolor{preprocessor}{}
+00133 \textcolor{comment}{//#if DOXYGEN}
+00134 \textcolor{preprocessor}{#define TS\_SETUP() \(\backslash\)}
+00135 \textcolor{preprocessor}{tsq(WRITE\_TL, 15); \(\backslash\)}
+00136 \textcolor{preprocessor}{tsq(WRITE\_TH, 30); \(\backslash\)}
+00137 \textcolor{preprocessor}{tsq(WRITE\_CONF, TS\_CONF); \(\backslash\)}
+00138 \textcolor{preprocessor}{tsq(RUN\_CONV, 0)}
+00139 \textcolor{preprocessor}{}\textcolor{comment}{//#endif}
+00140 
+00141 \textcolor{comment}{/* #define TS\_WAIT() */}
+00142 
+00145 \textcolor{keywordtype}{short} \textcolor{keywordtype}{int} temp = 0; 
+00175 \textcolor{keywordtype}{void} ts_wait( \textcolor{keywordtype}{void} )
+00176 \{
+00177 \textcolor{preprocessor}{#ifdef USE\_ASM\_TS\_WAIT}
+00178 \textcolor{preprocessor}{}
+00179 \textcolor{preprocessor}{#ifdef SDCC}
+00180 \textcolor{preprocessor}{}\_asm
+00181         MOV     R0, #007h
+00182         NOP
+00183         DJNZ    R0, $
+00184         NOP
+00185         NOP
+00186 \_endasm;
+00187 \textcolor{preprocessor}{#else }\textcolor{comment}{/* !SDCC */}
+00188 INLINE\_ASM\_BEGIN\_KEYORD
+00189         MOV     R0, #007h
+00190         NOP
+00191         DJNZ    R0, $
+00192         NOP
+00193         NOP
+00194 INLINE\_ASM\_END\_KEYWORD
+00195 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* SDCC || !SDCC */}
+00196 
+00197 \textcolor{preprocessor}{#else }\textcolor{comment}{/* !USE\_ASM\_TS\_WAIT */}
+00198 
+00199   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} i, j;
+00200 
+00202   \textcolor{keywordflow}{for}( i = 0; i < 10; i++ ) \{
+00203 
+00204     \textcolor{keywordflow}{for}( j = 0; j < 5; j++ ) \{;\}
+00205 
+00206   \}
+00207 
+00208 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* USE\_ASM\_TS\_WAIT */}
+00209 \}
+00210 
+00222 \textcolor{keywordtype}{void} tsc( \textcolor{keywordtype}{char} byte )
+00223 \{
+00224 
+00254   \textcolor{keywordtype}{char} n;
+00255 
+00256   \textcolor{keywordflow}{for}( n = 0; n < 8; n++ ) \{
+00257 
+00258     TS_DATA = ( byte >> n ) & 0x01;
+00259 
+00260     TS_TICK();
+00261 
+00262   \}
+00263 
+00264 \}
+00265 
+00279 \textcolor{keywordtype}{int} tsq( \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} mode, \textcolor{keywordtype}{int} data )
+00280 \{
+00281 
+00282   \textcolor{keywordtype}{char} n; \textcolor{keywordtype}{int} read = 0;
+00283 
+00308 \textcolor{preprocessor}{}
+00313   \textcolor{keywordflow}{switch}( mode ) \{
+00314 
+00320     \textcolor{keywordflow}{case} RUN_CONV:
+00321     \textcolor{keywordflow}{case} END_CONV:
+00322 
+00323       TS_START();
+00324 
+00325       tsc(mode);
+00326 
+00327       TS_STOP();
+00328 
+00329       \textcolor{keywordflow}{break};
+00330 
+00406     \textcolor{keywordflow}{case} READ_SLOPE:
+00407     \textcolor{keywordflow}{case} READ_COUNT:
+00408     \textcolor{keywordflow}{case} READ_TEMP:
+00409     \textcolor{keywordflow}{case} READ_TH:
+00410     \textcolor{keywordflow}{case} READ_TL:
+00411 
+00412 
+00413       TS_START();
+00414 
+00415       \textcolor{comment}{/* Send the command byte. */}
+00416       tsc(mode);
+00417 
+00418       \textcolor{comment}{/* Pull-up to Hi-Z state for input. */}
+00419       TS_DATA = 1;
+00420 
+00421       \textcolor{comment}{/* Read data with negative clock pulse. */}
+00422       \textcolor{keywordflow}{for}( n = 0; n < 9; n++ ) \{
+00423 
+00424         TS_CLOCK = 0;
+00425 
+00426         read = TS\_DATA;
+00427 
+00428         TS_CLOCK = 1;
+00429 
+00430         data = data | read << n;
+00431 
+00432       \}
+00433 
+00434       \textcolor{comment}{/* Pull-down the pin state for writing. */}
+00435       TS_DATA = 0;
+00436 
+00437       TS_STOP();
+00438 
+00439       \textcolor{keywordflow}{if}( mode == READ_TL || \(\backslash\)
+00440           mode == READ_TH || \(\backslash\)
+00441           mode == READ_TEMP ) \{
+00442 
+00443         \textcolor{comment}{/* Check for negative temperature reading. */}
+00444         \textcolor{keywordflow}{if}(( mode == READ_TEMP ) \(\backslash\)
+00445           && ( data & 0x0100 )) \{
+00446   
+00447             temp = data & 0x00ff;
+00448   
+00449             temp = 0x0100 - temp;
+00450   
+00451             temp *= (short)-1;
+00452 
+00453             \textcolor{keywordflow}{return} ( temp / 2 );
+00454   
+00455           \} \textcolor{keywordflow}{else} \{
+00456 
+00457             \textcolor{keywordflow}{return} ( data / 2 );
+00458 
+00459           \}
+00460 
+00461       \} \textcolor{keywordflow}{else} \{
+00462 
+00463         \textcolor{keywordflow}{return} ( data );
+00464 
+00465       \}
+00466 
+00467       \textcolor{comment}{/* break; */}
+00468 
+00476     \textcolor{keywordflow}{case} WRITE_TH:
+00477     \textcolor{keywordflow}{case} WRITE_TL:
+00478 
+00479       TS_START();
+00480 
+00481       tsc(mode);
+00482 
+00483       \textcolor{keywordflow}{if}( mode == WRITE_TL || mode == WRITE_TH ) \{
+00484 
+00485         data *= 2;
+00486 
+00487       \}
+00488 
+00489       \textcolor{comment}{/* Write data with negative clock pulse. */}
+00490       \textcolor{keywordflow}{for}( n = 0; n < 9; n++ ) \{
+00491 
+00492         TS_DATA = ( data >> n ) & 0x01;
+00493 
+00494         TS_TICK();
+00495 
+00496       \}
+00497 
+00498       ts_wait();
+00499 
+00500       TS_STOP();
+00501 
+00502       \textcolor{keywordflow}{break};
+00503 
+00506     \textcolor{keywordflow}{case} WRITE_CONF:
+00507 
+00508       TS_START();
+00509 
+00510       tsc(mode);
+00511 
+00512       tsc(data); 
+00513 
+00514       ts_wait();
+00515 
+00516       TS_STOP();
+00517 
+00518       \textcolor{keywordflow}{break};
+00519 
+00521     \textcolor{keywordflow}{case} TEST:
+00522 
+00523         TS_START();
+00524 
+00525         TS_STOP();
+00526 
+00527         \textcolor{keywordflow}{return} ( data );
+00528 
+00529         \textcolor{comment}{/* break; */}
+00530 
+00531   \}
+00532 
+00533   \textcolor{keywordflow}{return} 0;
+00534 \}
+00535 
+00541 \textcolor{keywordtype}{void} sensor_setup( \textcolor{keywordtype}{void} )
+00542 \{
+00543 
+00546   TS_SETUP();
+00547 
+00548 \}
+00549 
+00556 \textcolor{keywordtype}{int} sensor_read( \textcolor{keywordtype}{void} )
+00557 \{
+00558 
+00564   \textcolor{keywordflow}{return} tsq(READ_TEMP,0);
+00565 
+00566 \}
+00567 
+00576 \textcolor{preprocessor}{#if TESTING\_FUNCTIONS || DOXYGEN}
+00577 \textcolor{preprocessor}{}\textcolor{keywordtype}{void} sensor_test_loop( \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} x )
+00578 \{
+00579 
+00580   \textcolor{keywordflow}{while}(x--) \{
+00581 
+00584     tsq(TEST, 100);
+00585 
+00586   \}
+00587 
+00588 \}
+00589 \textcolor{preprocessor}{#endif}
+00590 \textcolor{preprocessor}{}
+00591 \textcolor{preprocessor}{#ifndef MAIN\_PROGRAM}
+00592 \textcolor{preprocessor}{}
+00599 \textcolor{preprocessor}{#if STANDALONE\_TEST || DOXYGEN}
+00600 \textcolor{preprocessor}{}\textcolor{keywordtype}{void} main (\textcolor{keywordtype}{void})
+00601 \{
+00602 
+00605   sensor_test_loop(2);
+00606 
+00607 \}
+00608 \textcolor{preprocessor}{#endif}
+00609 \textcolor{preprocessor}{}\textcolor{preprocessor}{#endif}
+\end{DoxyCode}

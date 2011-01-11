@@ -1,0 +1,223 @@
+\section{segment\_\-display.c}
+
+\begin{DoxyCode}
+00001 
+00034 \textcolor{preprocessor}{#ifdef SDCC}
+00035 \textcolor{preprocessor}{}\textcolor{preprocessor}{#include <at89x51.h>}
+00036 \textcolor{preprocessor}{#else}
+00037 \textcolor{preprocessor}{}\textcolor{preprocessor}{#include <reg51.h>}
+00038 \textcolor{preprocessor}{#endif}
+00039 \textcolor{preprocessor}{}
+00040 \textcolor{preprocessor}{#include "settings.h"}
+00041 \textcolor{preprocessor}{#include "prototypes.h"}
+00042 
+00043 \textcolor{preprocessor}{#if DOXYGEN }\textcolor{comment}{/* These definitions are only for documentation. */}
+00044 
+00050 \textcolor{preprocessor}{#define TESTING\_FUNCTIONS       [( 0 | 1 )]}
+00051 \textcolor{preprocessor}{}
+00052 \textcolor{preprocessor}{#define STANDALONE\_TEST         [( 0 | 1 )]}
+00053 \textcolor{preprocessor}{}
+00060 \textcolor{preprocessor}{#define BASIC\_METHOD            [( 0 | 1 )] }
+00068 \textcolor{preprocessor}{#define DIGIT [( P0 | P1 | P2 | P3 )] }
+00069 \textcolor{preprocessor}{#define SEGMENT [( P0 | P1 | P2 | P3 )] }
+00076 \textcolor{preprocessor}{#define COMMON\_PIN [( ANODE | CATHODE )]}
+00077 \textcolor{preprocessor}{}
+00078 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* DOXYGEN */}
+00079 
+00080 \textcolor{preprocessor}{#define ANODE 1}
+00081 \textcolor{preprocessor}{}\textcolor{preprocessor}{#define CATHODE 0}
+00082 \textcolor{preprocessor}{}
+00084 \textcolor{preprocessor}{#if DOXYGEN}
+00085 \textcolor{preprocessor}{}
+00090 \textcolor{preprocessor}{#define SHIFTDIR [( << | >> )] }
+00092 \textcolor{preprocessor}{#define FIRST\_DIGIT [( 0 | 3 | 4 | 7 )] }
+00095 \textcolor{preprocessor}{#endif}
+00096 \textcolor{preprocessor}{}
+00097 \textcolor{preprocessor}{#if !BASIC\_METHOD}
+00098 \textcolor{preprocessor}{}\textcolor{preprocessor}{#warning "Computationally intensive universal method will be used!"}
+00099 \textcolor{preprocessor}{}\textcolor{preprocessor}{  #ifndef SHIFTDIR}
+00100 \textcolor{preprocessor}{}\textcolor{preprocessor}{   #if ( (FIRST\_DIGIT == 4) || (FIRST\_DIGIT == 0) )}
+00101 \textcolor{preprocessor}{}\textcolor{preprocessor}{   #define SHIFTDIR <<}
+00102 \textcolor{preprocessor}{}\textcolor{preprocessor}{   #elif ( (FIRST\_DIGIT == 7) || (FIRST\_DIGIT == 3) )}
+00103 \textcolor{preprocessor}{}\textcolor{preprocessor}{   #define SHIFTDIR >> }
+00104 \textcolor{preprocessor}{}\textcolor{preprocessor}{   #else}
+00105 \textcolor{preprocessor}{}\textcolor{preprocessor}{   #warning "In universal method values of first digit other then 7, 4, 3 or 0 re
+      quire specific direction!"}
+00106 \textcolor{preprocessor}{}\textcolor{preprocessor}{   #endif}
+00107 \textcolor{preprocessor}{}\textcolor{preprocessor}{  #endif}
+00108 \textcolor{preprocessor}{}\textcolor{preprocessor}{#endif}
+00109 \textcolor{preprocessor}{}
+00120 \textcolor{preprocessor}{#if DOXYGEN}
+00121 \textcolor{preprocessor}{}\textcolor{keywordtype}{char} figure[13] = \{
+00122 \textcolor{preprocessor}{#else}
+00123 \textcolor{preprocessor}{}\textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} figure[13] = \{
+00124 \textcolor{preprocessor}{#endif}
+00125 \textcolor{preprocessor}{}
+00126 \textcolor{preprocessor}{#ifdef REVERSE\_SEGMENTS}
+00127 \textcolor{preprocessor}{}\textcolor{preprocessor}{#error "Reverse connection of segments not implemented!"}
+00128 \textcolor{preprocessor}{}\textcolor{preprocessor}{#endif}
+00129 \textcolor{preprocessor}{}
+00130 \textcolor{preprocessor}{#if COMMON\_PIN == ANODE}
+00131 \textcolor{preprocessor}{}
+00132   0xc0, \textcolor{comment}{// = 0}
+00133   0xf9, \textcolor{comment}{// = 1}
+00134   0xa4, \textcolor{comment}{// = 2}
+00135   0xb0, \textcolor{comment}{// = 3}
+00136   0x99, \textcolor{comment}{// = 4}
+00137   0x92, \textcolor{comment}{// = 5}
+00138   0x82, \textcolor{comment}{// = 6}
+00139   0xF8, \textcolor{comment}{// = 7}
+00140   0x80, \textcolor{comment}{// = 8}
+00141   0x90, \textcolor{comment}{// = 9}
+00142   0xbf, \textcolor{comment}{// = -}
+00143   0xc6, \textcolor{comment}{// = C}
+00144   0x8e  \textcolor{comment}{// = F}
+00145 
+00146 \textcolor{preprocessor}{#else }\textcolor{comment}{/* COMMON\_PIN == CATHODE */}
+00147 
+00148   0x3F, \textcolor{comment}{// = 0}
+00149   0x06, \textcolor{comment}{// = 1}
+00150   0x5B, \textcolor{comment}{// = 2}
+00151   0x47, \textcolor{comment}{// = 3}
+00152   0x66, \textcolor{comment}{// = 4}
+00153   0x6d, \textcolor{comment}{// = 5}
+00154   0x75, \textcolor{comment}{// = 6}
+00155   0x07, \textcolor{comment}{// = 7}
+00156   0x7f, \textcolor{comment}{// = 8}
+00157   0x6f, \textcolor{comment}{// = 9}
+00158   0x40, \textcolor{comment}{// = -}
+00159   0x39, \textcolor{comment}{// = C}
+00160   0x71  \textcolor{comment}{// = F}
+00161 
+00162 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* COMMON\_PIN */}
+00163 
+00164 \textcolor{preprocessor}{#if !DOXYGEN}
+00165 \textcolor{preprocessor}{}\textcolor{preprocessor}{#define SYM\_MINUS 10}
+00166 \textcolor{preprocessor}{}\textcolor{preprocessor}{#define SYM\_C 11}
+00167 \textcolor{preprocessor}{}\textcolor{preprocessor}{#define SYM\_F 12}
+00168 \textcolor{preprocessor}{}\textcolor{preprocessor}{#endif}
+00169 \textcolor{preprocessor}{}
+00170 \}; 
+00186 \textcolor{keywordtype}{void} display_digit( \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} d, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} v )
+00187 \{
+00188 
+00263   SEGMENT = figure[v];
+00264 
+00265 \textcolor{preprocessor}{  #if BASIC\_METHOD}
+00266 \textcolor{preprocessor}{}
+00267 \textcolor{preprocessor}{   #if ( FIRST\_DIGIT == 7 )}
+00268 \textcolor{preprocessor}{}   DIGIT = ~( 128 >> d );
+00269 
+00270 \textcolor{preprocessor}{   #elif ( FIRST\_DIGIT == 3 )}
+00271 \textcolor{preprocessor}{}   DIGIT = ~( 8 >> d);
+00272 
+00273 \textcolor{preprocessor}{   #elif ( FIRST\_DIGIT == 4 )}
+00274 \textcolor{preprocessor}{}   DIGIT = ~( 16 << d);
+00275 
+00276 \textcolor{preprocessor}{   #elif ( FIRST\_DIGIT == 0 )}
+00277 \textcolor{preprocessor}{}   DIGIT = ~( 1 << d );
+00278 
+00279 \textcolor{preprocessor}{   #else}
+00280 \textcolor{preprocessor}{}\textcolor{preprocessor}{   #warning "In basic method values of first digit can be 7, 4, 3 or 0 only!"}
+00281 \textcolor{preprocessor}{}\textcolor{preprocessor}{   #endif}
+00282 \textcolor{preprocessor}{}
+00283 \textcolor{preprocessor}{  #else }\textcolor{comment}{/* GOOD\_METHOD\_IN\_THEORY */}
+00284 
+00285   DIGIT = ~( (1<<FIRST\_DIGIT) SHIFTDIR d );
+00286 
+00287 \textcolor{preprocessor}{  #endif}
+00288 \textcolor{preprocessor}{}
+00289 \}
+00290 
+00310 \textcolor{keywordtype}{void} display_number( \textcolor{keywordtype}{int} x, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t )
+00311 \{
+00312 
+00313 \textcolor{preprocessor}{#ifndef DOXYGEN}
+00314 \textcolor{preprocessor}{}\textcolor{preprocessor}{#define REM(X, Y) X/Y; X %= Y}
+00315 \textcolor{preprocessor}{}\textcolor{preprocessor}{#endif}
+00316 \textcolor{preprocessor}{}
+00317   \textcolor{keywordtype}{char} n[4], m[4] = \{1, 1, 1, 1\}, i;
+00323   \textcolor{keywordflow}{if}( x >= 0 ) \{
+00324 
+00325   n[3] = REM(x, 1000);
+00326   \textcolor{keywordflow}{if}( n[3] == 0 )
+00327    m[3] = 0;
+00328 
+00329   n[2] = REM(x, 100);
+00330   \textcolor{keywordflow}{if}( n[2] == 0 && m[3] == 0 ) m[2] = 0;
+00331 
+00332   n[1] = REM(x, 10);
+00333   \textcolor{keywordflow}{if}( n[1] == 0 && m[2] == 0 ) m[1] = 0;
+00334 
+00335   n[0] = x;
+00336 
+00337   \} \textcolor{keywordflow}{else} \{
+00338 
+00339   x *= -1;
+00340 
+00341   n[3] = SYM\_MINUS;
+00342 
+00343   n[2] = REM(x, 100);
+00344   \textcolor{keywordflow}{if}( n[2] == 0 ) m[2] = 0;
+00345 
+00346   n[1] = REM(x, 10);
+00347   \textcolor{keywordflow}{if}( n[1] == 0 && m[2] == 0 ) m[1] = 0;
+00348 
+00349   n[0] = x;
+00350 
+00351   \}
+00353   \textcolor{keywordflow}{while}(t--) \{
+00354 
+00355     \textcolor{keywordflow}{for}( i = 0; i < 4; i++ ) \{
+00362       \textcolor{keywordflow}{if}( m[i] ) display_digit( i, n[i] );
+00363       \textcolor{comment}{/* DISPLAY\_HOLD(); */}
+00364       DIGIT = 0xff;
+00365 
+00366     \}
+00367 
+00368   \}
+00369 
+00370 \}
+00371 
+00381 \textcolor{preprocessor}{#if TESTING\_FUNCTIONS || DOXYGEN}
+00382 \textcolor{preprocessor}{}\textcolor{keywordtype}{void} display_test_loop( \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} t )
+00383 \{
+00384 
+00385   \textcolor{keywordtype}{short} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i, j;
+00386 
+00389   \textcolor{keywordflow}{while}(t--) \{
+00390 
+00391     \textcolor{keywordflow}{for}( i=0; i<10; i++ ) \{
+00392 
+00393       \textcolor{keywordflow}{for}( j=0; j<4; j++ ) \{
+00394 
+00395         display_digit( j, i );
+00396 
+00397       \}
+00398 
+00399     \}
+00400 
+00401   \}
+00402 
+00403 \}
+00404 \textcolor{preprocessor}{#endif}
+00405 \textcolor{preprocessor}{}
+00406 
+00407 \textcolor{preprocessor}{#ifndef MAIN\_PROGRAM}
+00408 \textcolor{preprocessor}{}
+00415 \textcolor{preprocessor}{#if STANDALONE\_TEST || DOXYGEN}
+00416 \textcolor{preprocessor}{}\textcolor{keywordtype}{void} main (\textcolor{keywordtype}{void})
+00417 \{
+00418 
+00421   \textcolor{comment}{//display\_test\_loop(2);}
+00422   \textcolor{comment}{//DIGIT = 0xff;}
+00423 
+00424   display_number(-768, 20);
+00425   display_number(1769, 20);
+00426   display_number(2761, 20);
+00427 
+00428 \}
+00429 \textcolor{preprocessor}{#endif}
+00430 \textcolor{preprocessor}{}\textcolor{preprocessor}{#endif}
+00431 \textcolor{preprocessor}{}
+\end{DoxyCode}

@@ -1,0 +1,321 @@
+\section{segment\_\-display.c File Reference}
+\label{segment__display_8c}\index{segment\_\-display.c@{segment\_\-display.c}}
+
+
+This file implements LED digital display driver.  
+
+
+{\ttfamily \#include $<$at89x51.h$>$}\par
+{\ttfamily \#include \char`\"{}settings.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}prototypes.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{Indent}{\bf Software Configuration}\par
+{\em \label{_amgrpda0a44c92753f58fd7c7ba36319950a1}
+ These macros can be used to switch different parts of code. }\begin{DoxyCompactItemize}
+\item 
+\#define {\bf TESTING\_\-FUNCTIONS}~[( 0 $|$ 1 )]\label{segment__display_8c_ae0ae932a749d5795e43cc1346f62ac3e}
+
+\begin{DoxyCompactList}\small\item\em Include \doxyref{display\_\-test\_\-loop()}{p.}{segment__display_8c_a28fb096352172525e5b684e487e6d22c} function. \item\end{DoxyCompactList}\item 
+\#define {\bf STANDALONE\_\-TEST}~[( 0 $|$ 1 )]\label{segment__display_8c_ad338485bb9393355e7ba3525374f5b6a}
+
+\begin{DoxyCompactList}\small\item\em Include \doxyref{main()}{p.}{main_8c_a6288eba0f8e8ad3ab1544ad731eb7667} loop for testing. \item\end{DoxyCompactList}\item 
+\#define {\bf BASIC\_\-METHOD}~[( 0 $|$ 1 )]
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf LED Interface Pins}\par
+{\em \label{_amgrp11b8f7e014eedcd0a664edbfdb83575e}
+ These constants define which ports are in use for LED display. }\begin{DoxyCompactItemize}
+\item 
+\#define {\bf DIGIT}~[( P0 $|$ P1 $|$ P2 $|$ P3 )]
+\item 
+\#define {\bf SEGMENT}~[( P0 $|$ P1 $|$ P2 $|$ P3 )]
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf }\par
+{\em \label{_amgrpd41d8cd98f00b204e9800998ecf8427e}
+ }\begin{DoxyCompactItemize}
+\item 
+\#define {\bf COMMON\_\-PIN}~[( ANODE $|$ CATHODE )]
+\item 
+\#define {\bfseries ANODE}~1\label{segment__display_8c_a5becbba568b7809ba8d30ec51edb9128}
+
+\item 
+\#define {\bfseries CATHODE}~0\label{segment__display_8c_a4837fabffaba94bd3f3b86c359aa7756}
+
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf }\par
+{\em \label{_amgrpd41d8cd98f00b204e9800998ecf8427e}
+ }\begin{DoxyCompactItemize}
+\item 
+\#define {\bf SHIFTDIR}~[( $<$$<$ $|$ $>$$>$ )]
+\item 
+\#define {\bf FIRST\_\-DIGIT}~[( 0 $|$ 3 $|$ 4 $|$ 7 )]
+\end{DoxyCompactItemize}
+\end{Indent}
+\subsection*{Functions}
+\begin{Indent}{\bf The Function to Display a Digit}\par
+{\em \label{_amgrp242773f260e56d13335fda5277412004}
+This function takes the array \doxyref{figure}{p.}{segment__display_8c_a1e4cb03201d4ace19041d8c53fae3500} and looks-\/up the code by index to write to pins of \doxyref{SEGMENT}{p.}{segment__display_8c_a47297f8b040075280c6d3becc499bd82} port. It also selects the right value to pull \doxyref{DIGIT}{p.}{segment__display_8c_a75405d0fa11f1bf15346f61ed092f448} pins depending on configuration of \doxyref{FIRST\_\-DIGIT}{p.}{segment__display_8c_a56a27d4bf0e61b1cb6fb16baaa6a0244}.
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em d}]digit position (0 to 3) \item[{\em v}]value of digit (0 to 9) \end{DoxyParams}
+}\begin{DoxyCompactItemize}
+\item 
+void {\bf display\_\-digit} (unsigned char d, unsigned char v)
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf The Function to Display a Number}\par
+{\em \label{_amgrp687096ab082d1c2fdacffb5a055564e3}
+This function calls \doxyref{display\_\-digit()}{p.}{segment__display_8c_a071fd04cdfca2cbca02d84feaf6634bf}
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em x}]number to display (-\/999 to 9999) \item[{\em t}]number of refresh cycles\end{DoxyParams}
+It uses an extra array for marking which digit should be OFF in case if it is zero and there no other digit in front of it. It could probably use a 4-\/bit mask. Bit arrays are not allowed by SDCC.
+
+\begin{DoxyNote}{Note}
+There is no boundary checking, therefore the value of the argument should be between -\/999 and 9999. It was considered not appropriate to implement fixed decimal point. 
+\end{DoxyNote}
+}\begin{DoxyCompactItemize}
+\item 
+void {\bf display\_\-number} (int x, unsigned int t)
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf Display Test Loop}\par
+{\em \label{_amgrpb871cc5114697ffb2e105fcca91e3e25}
+This is a scrolling loop intended for display hardware tests and basic demo. It can be disabled by setting constant \doxyref{TESTING\_\-FUNCTIONS}{p.}{sensor__interface_8c_ae0ae932a749d5795e43cc1346f62ac3e} to 0. }\begin{DoxyCompactItemize}
+\item 
+void {\bf display\_\-test\_\-loop} (unsigned char t)
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf Standalone Testing Function}\par
+{\em \label{_amgrpf4a329893de9b0055b356c21d0c5d5c3}
+The \doxyref{main()}{p.}{main_8c_a6288eba0f8e8ad3ab1544ad731eb7667} function is only compiled when \doxyref{STANDALONE\_\-TEST}{p.}{sensor__interface_8c_ad338485bb9393355e7ba3525374f5b6a} is set to 1. }\begin{DoxyCompactItemize}
+\item 
+void {\bf main} (void)
+\end{DoxyCompactItemize}
+\end{Indent}
+\subsection*{Variables}
+\begin{Indent}{\bf }\par
+{\em \label{_amgrpd41d8cd98f00b204e9800998ecf8427e}
+ }\begin{DoxyCompactItemize}
+\item 
+char {\bf figure} [13]
+\end{DoxyCompactItemize}
+\end{Indent}
+
+
+\subsection{Detailed Description}
+This file implements LED digital display driver. The code has been tested with 4-\/digit 7-\/segment multiplexed LED display using GUI emulator.
+
+ 
+\begin{DoxyImage}
+\includegraphics{segment_display.png}
+\caption{MCU 8051 IDE Virtual Multiplexed LED Display}
+\end{DoxyImage}
+ The software is intended to run on MCU with different pin configurations for the connection of LED segments. Using two 8-\/bit ports up to 8 digits can be driven. There are a few pre-\/processor macros to configure the topology of pin connection. Common cathode or anode options are included, but reverse segment configuration has not been implemented; though, pins for digit selection may be connected in various ways.
+
+\begin{DoxyNote}{Note}
+DISPLAY\_\-HOLD() is not implemented. It requires testing with real LED display in order to determin the hold time period, which depends on fade-\/out time of real LED display.
+
+Therefore the \doxyref{display\_\-digit()}{p.}{segment__display_8c_a071fd04cdfca2cbca02d84feaf6634bf} function turns the segments off in order to prevent effect of moving digit. The function \doxyref{display\_\-number()}{p.}{segment__display_8c_aae321ea52abfe736b59c46aa9eafacc1} uses second argument to sepcify number of cycles.
+\end{DoxyNote}
+\begin{DoxyAuthor}{Author}
+Ilya Dmitrichenko $<${\tt errordeveloper@gmail.com}$>$ 
+\end{DoxyAuthor}
+
+
+Definition in file {\bf segment\_\-display.c}.
+
+
+
+\subsection{Define Documentation}
+\index{segment\_\-display.c@{segment\_\-display.c}!BASIC\_\-METHOD@{BASIC\_\-METHOD}}
+\index{BASIC\_\-METHOD@{BASIC\_\-METHOD}!segment_display.c@{segment\_\-display.c}}
+\subsubsection[{BASIC\_\-METHOD}]{\setlength{\rightskip}{0pt plus 5cm}\#define BASIC\_\-METHOD~[( 0 $|$ 1 )]}\label{segment__display_8c_a9c015ac8cfdf993e243e8d9f82a89e2e}
+There two ways of dealing with the way first digit is connected. One is faster and can be chosen by setting \doxyref{BASIC\_\-METHOD}{p.}{segment__display_8c_a9c015ac8cfdf993e243e8d9f82a89e2e} to 1. The other method involves an extra bit-\/shift operation and is more universal. With the second method \doxyref{SHIFTDIR}{p.}{segment__display_8c_a5933a27d82d6b336edc555b07ca86cc8} needs to be defined only if pins are connected in unusual order. Apply faster code for digit selection. 
+
+Definition at line {\bf 60} of file {\bf segment\_\-display.c}.
+
+\index{segment\_\-display.c@{segment\_\-display.c}!DIGIT@{DIGIT}}
+\index{DIGIT@{DIGIT}!segment_display.c@{segment\_\-display.c}}
+\subsubsection[{DIGIT}]{\setlength{\rightskip}{0pt plus 5cm}\#define DIGIT~[( P0 $|$ P1 $|$ P2 $|$ P3 )]}\label{segment__display_8c_a75405d0fa11f1bf15346f61ed092f448}
+Set the port for digit selection. 
+
+Definition at line {\bf 68} of file {\bf segment\_\-display.c}.
+
+\index{segment\_\-display.c@{segment\_\-display.c}!SEGMENT@{SEGMENT}}
+\index{SEGMENT@{SEGMENT}!segment_display.c@{segment\_\-display.c}}
+\subsubsection[{SEGMENT}]{\setlength{\rightskip}{0pt plus 5cm}\#define SEGMENT~[( P0 $|$ P1 $|$ P2 $|$ P3 )]}\label{segment__display_8c_a47297f8b040075280c6d3becc499bd82}
+Set the port for segment selection. 
+
+Definition at line {\bf 69} of file {\bf segment\_\-display.c}.
+
+\index{segment\_\-display.c@{segment\_\-display.c}!COMMON\_\-PIN@{COMMON\_\-PIN}}
+\index{COMMON\_\-PIN@{COMMON\_\-PIN}!segment_display.c@{segment\_\-display.c}}
+\subsubsection[{COMMON\_\-PIN}]{\setlength{\rightskip}{0pt plus 5cm}\#define COMMON\_\-PIN~[( ANODE $|$ CATHODE )]}\label{segment__display_8c_a47a8e6d644fbd0abf9872328b3e7f581}
+LED segment displays can be connected with common cathodes or anodes. 
+
+Definition at line {\bf 76} of file {\bf segment\_\-display.c}.
+
+\index{segment\_\-display.c@{segment\_\-display.c}!SHIFTDIR@{SHIFTDIR}}
+\index{SHIFTDIR@{SHIFTDIR}!segment_display.c@{segment\_\-display.c}}
+\subsubsection[{SHIFTDIR}]{\setlength{\rightskip}{0pt plus 5cm}\#define SHIFTDIR~[( $<$$<$ $|$ $>$$>$ )]}\label{segment__display_8c_a5933a27d82d6b336edc555b07ca86cc8}
+This code can operate in four pin configuration modes, modifications needed for unusual combination of these. When universal method is used this is set to '$<$$<$' or '$>$$>$'. 
+
+Definition at line {\bf 90} of file {\bf segment\_\-display.c}.
+
+\index{segment\_\-display.c@{segment\_\-display.c}!FIRST\_\-DIGIT@{FIRST\_\-DIGIT}}
+\index{FIRST\_\-DIGIT@{FIRST\_\-DIGIT}!segment_display.c@{segment\_\-display.c}}
+\subsubsection[{FIRST\_\-DIGIT}]{\setlength{\rightskip}{0pt plus 5cm}\#define FIRST\_\-DIGIT~[( 0 $|$ 3 $|$ 4 $|$ 7 )]}\label{segment__display_8c_a56a27d4bf0e61b1cb6fb16baaa6a0244}
+This can be set to 0, 3, 4 or 7. Other values require more changes. 
+
+Definition at line {\bf 92} of file {\bf segment\_\-display.c}.
+
+
+
+\subsection{Function Documentation}
+\index{segment\_\-display.c@{segment\_\-display.c}!display\_\-digit@{display\_\-digit}}
+\index{display\_\-digit@{display\_\-digit}!segment_display.c@{segment\_\-display.c}}
+\subsubsection[{display\_\-digit}]{\setlength{\rightskip}{0pt plus 5cm}void display\_\-digit (
+\begin{DoxyParamCaption}
+\item[{unsigned char}]{ d, }
+\item[{unsigned char}]{ v}
+\end{DoxyParamCaption}
+)}\label{segment__display_8c_a071fd04cdfca2cbca02d84feaf6634bf}
+
+
+Presuming that the digit 0 is connected to pin 7 of \doxyref{DIGIT}{p.}{segment__display_8c_a75405d0fa11f1bf15346f61ed092f448}, a clear pattern can be identified:
+
+
+\begin{DoxyCode}
+         \textcolor{keywordflow}{switch}(d)
+         \{
+                \textcolor{keywordflow}{case} 0:
+                        DIGIT = 0x80; \textcolor{comment}{// 10000000 = 128}
+                \textcolor{keywordflow}{case} 1:
+                        DIGIT = 0x40; \textcolor{comment}{// 01000000 = 64}
+                \textcolor{keywordflow}{case} 2:
+                        DIGIT = 0x20; \textcolor{comment}{// 00100000 = 32}
+                \textcolor{keywordflow}{case} 3:
+                        DIGIT = 0x16; \textcolor{comment}{// 00010000 = 16}
+                \textcolor{keywordflow}{default}:
+                        DIGIT = 0xff; \textcolor{comment}{// Off}
+        \}
+\end{DoxyCode}
+
+
+It can be expressed as:
+
+
+\begin{DoxyCode}
+ DIGIT = 128/(2**d)
+\end{DoxyCode}
+
+
+However, the '$\ast$$\ast$' operator is not valid in C, and using 'math.h' is not considered appropriate for this small design.
+
+It is in fact most appropriate to use '$>$$>$' bit-\/shift operator:
+
+
+\begin{DoxyCode}
+ DIGIT = (128 >> d);
+\end{DoxyCode}
+
+
+Though, it turns out that the above values (128, 64, 32, 16) are wrong. We should invert the bits:
+
+
+\begin{DoxyCode}
+ DIGIT = ~(128 >> d);
+\end{DoxyCode}
+
+
+By experiment, two techniques were found. One uses hard-\/coded assignments for each particular predefined pin configuration. Setting \doxyref{BASIC\_\-METHOD}{p.}{segment__display_8c_a9c015ac8cfdf993e243e8d9f82a89e2e} to 1 enables this technique.
+
+More universal but computation-\/intensive method would be:
+
+
+\begin{DoxyCode}
+ \textcolor{keywordflow}{switch}(FIRST_DIGIT)
+ \{
+        \textcolor{keywordflow}{case} LOWER:
+        ~( (1<<FIRST\_DIGIT) >> d ); \textcolor{keywordflow}{break};
+        \textcolor{keywordflow}{case} UPPER:
+        ~( (1<<FIRST\_DIGIT) << d ); \textcolor{keywordflow}{break};
+ \}
+\end{DoxyCode}
+
+
+The code, in fact, takes advantage of pre-\/processor conditional definitions and uses \doxyref{SHIFTDIR}{p.}{segment__display_8c_a5933a27d82d6b336edc555b07ca86cc8} set to '$<$$<$' or '$>$$>$' depending what the value of \doxyref{FIRST\_\-DIGIT}{p.}{segment__display_8c_a56a27d4bf0e61b1cb6fb16baaa6a0244} is set to. In an unusual case \doxyref{SHIFTDIR}{p.}{segment__display_8c_a5933a27d82d6b336edc555b07ca86cc8} has to be set manually.
+
+
+
+Definition at line {\bf 186} of file {\bf segment\_\-display.c}.
+
+\index{segment\_\-display.c@{segment\_\-display.c}!display\_\-number@{display\_\-number}}
+\index{display\_\-number@{display\_\-number}!segment_display.c@{segment\_\-display.c}}
+\subsubsection[{display\_\-number}]{\setlength{\rightskip}{0pt plus 5cm}void display\_\-number (
+\begin{DoxyParamCaption}
+\item[{int}]{ x, }
+\item[{unsigned int}]{ t}
+\end{DoxyParamCaption}
+)}\label{segment__display_8c_aae321ea52abfe736b59c46aa9eafacc1}
+
+
+Determin the value of each decimal place by using int division and remainder.
+
+Repeat for t times.
+
+If a digit is zero the it it is not displayed, unless there is a non-\/zero digit in from of it.
+
+
+
+Definition at line {\bf 310} of file {\bf segment\_\-display.c}.
+
+\index{segment\_\-display.c@{segment\_\-display.c}!display\_\-test\_\-loop@{display\_\-test\_\-loop}}
+\index{display\_\-test\_\-loop@{display\_\-test\_\-loop}!segment_display.c@{segment\_\-display.c}}
+\subsubsection[{display\_\-test\_\-loop}]{\setlength{\rightskip}{0pt plus 5cm}void display\_\-test\_\-loop (
+\begin{DoxyParamCaption}
+\item[{unsigned char}]{ t}
+\end{DoxyParamCaption}
+)}\label{segment__display_8c_a28fb096352172525e5b684e487e6d22c}
+
+
+Scroll full count t times.
+
+
+
+Definition at line {\bf 382} of file {\bf segment\_\-display.c}.
+
+\index{segment\_\-display.c@{segment\_\-display.c}!main@{main}}
+\index{main@{main}!segment_display.c@{segment\_\-display.c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}void main (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{segment__display_8c_a6288eba0f8e8ad3ab1544ad731eb7667}
+
+
+Run \doxyref{display\_\-test\_\-loop()}{p.}{segment__display_8c_a28fb096352172525e5b684e487e6d22c} 2 times.
+
+
+
+Definition at line {\bf 416} of file {\bf segment\_\-display.c}.
+
+
+
+\subsection{Variable Documentation}
+\index{segment\_\-display.c@{segment\_\-display.c}!figure@{figure}}
+\index{figure@{figure}!segment_display.c@{segment\_\-display.c}}
+\subsubsection[{figure}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf figure}[13]}\label{segment__display_8c_a1e4cb03201d4ace19041d8c53fae3500}
+Store a digit code look-\/up table (array) in ROM, perhaps otherwise an enumeration could be used.
+
+There two option for pre-\/processor to chose from depending of \doxyref{COMMON\_\-PIN}{p.}{segment__display_8c_a47a8e6d644fbd0abf9872328b3e7f581}.
+
+Index 10, 11 and 12 are used for '-\/', 'C' and 'F'. 
+
+Definition at line {\bf 121} of file {\bf segment\_\-display.c}.
+

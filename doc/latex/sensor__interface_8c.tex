@@ -1,0 +1,456 @@
+\section{sensor\_\-interface.c File Reference}
+\label{sensor__interface_8c}\index{sensor\_\-interface.c@{sensor\_\-interface.c}}
+
+
+This file implements {\ttfamily DS1620} digital temperature sensor driver.  
+
+
+{\ttfamily \#include $<$at89x51.h$>$}\par
+{\ttfamily \#include \char`\"{}settings.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}prototypes.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{Indent}{\bf DS1620 Commands}\par
+{\em \label{_amgrpbfdbb8f681a62d6b8c9bbeac757ba8cf}
+ }\begin{DoxyCompactItemize}
+\item 
+\#define {\bf READ\_\-TEMP}~0xAA\label{sensor__interface_8c_ac8c23082885adeec4834469b64e00bb9}
+
+\begin{DoxyCompactList}\small\item\em Read temperature value from the register. \item\end{DoxyCompactList}\item 
+\#define {\bf WRITE\_\-TH}~0x01\label{sensor__interface_8c_a5d3ffdb2b80ee63715d3cf3795cbed59}
+
+\begin{DoxyCompactList}\small\item\em Write to the TH (Trigger High) register. \item\end{DoxyCompactList}\item 
+\#define {\bf WRITE\_\-TL}~0x02\label{sensor__interface_8c_a32dd3f772426c4f6c91c8226e016dae1}
+
+\begin{DoxyCompactList}\small\item\em Write to the TL (Trigger Low) register. \item\end{DoxyCompactList}\item 
+\#define {\bf READ\_\-TH}~0xA1\label{sensor__interface_8c_a5146064cb3c944c28b8dbe6f8d7aa31b}
+
+\begin{DoxyCompactList}\small\item\em Read the TH (Trigger High) register. \item\end{DoxyCompactList}\item 
+\#define {\bf READ\_\-TL}~0xA2\label{sensor__interface_8c_ac32d2ece473c8c8456f3b7de7d92f077}
+
+\begin{DoxyCompactList}\small\item\em Read the TL (Trigger Low) register. \item\end{DoxyCompactList}\item 
+\#define {\bf READ\_\-COUNT}~0xA0\label{sensor__interface_8c_ad222baf9301d2d35a5c928a0d91c4335}
+
+\begin{DoxyCompactList}\small\item\em Read the value of the counter byte. \item\end{DoxyCompactList}\item 
+\#define {\bf READ\_\-SLOPE}~0xA9\label{sensor__interface_8c_adaf3f5870ee00760c021c8e4f20d63cc}
+
+\begin{DoxyCompactList}\small\item\em Read the value of the slope counter. \item\end{DoxyCompactList}\item 
+\#define {\bf RUN\_\-CONV}~0xEE\label{sensor__interface_8c_a276eb00e22ed058d4b898973348424ad}
+
+\begin{DoxyCompactList}\small\item\em Start temperature conversion. \item\end{DoxyCompactList}\item 
+\#define {\bf END\_\-CONV}~0x22\label{sensor__interface_8c_a9c2a143dfdf5d3644b0dc61c5ba66510}
+
+\begin{DoxyCompactList}\small\item\em Stop temperature conversion. \item\end{DoxyCompactList}\item 
+\#define {\bf WRITE\_\-CONF}~0x0C\label{sensor__interface_8c_af9a32cf89944957ead157bf67795313e}
+
+\begin{DoxyCompactList}\small\item\em Write configuration register. \item\end{DoxyCompactList}\item 
+\#define {\bf READ\_\-CONF}~0xAC\label{sensor__interface_8c_af9c7d9c10702a51c8cc91a6b74a52ce2}
+
+\begin{DoxyCompactList}\small\item\em Read configuration register. \item\end{DoxyCompactList}\item 
+\#define {\bf TEST}~0x00\label{sensor__interface_8c_ab946e2e7f7679350627acfded8e2658b}
+
+\begin{DoxyCompactList}\small\item\em Software testing only. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf DS1620 Constants}\par
+{\em \label{_amgrp19e0bc793a2aa63fd0f874cce4b26f96}
+ }\begin{DoxyCompactItemize}
+\item 
+\#define {\bf WRITE\_\-DELAY}~20
+\begin{DoxyCompactList}\small\item\em Time to wait (20 ms) after a {\ttfamily EEPROM} write. \item\end{DoxyCompactList}\item 
+\#define {\bf TS\_\-CONF}~10
+\begin{DoxyCompactList}\small\item\em Enables CPU-\/mode and disables single-\/shot-\/mode. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf Software Configuration}\par
+{\em \label{_amgrpda0a44c92753f58fd7c7ba36319950a1}
+ These macros can be used to switch different parts of code. }\begin{DoxyCompactItemize}
+\item 
+\#define {\bf TESTING\_\-FUNCTIONS}~[( 0 $|$ 1 )]\label{sensor__interface_8c_ae0ae932a749d5795e43cc1346f62ac3e}
+
+\begin{DoxyCompactList}\small\item\em Include \doxyref{sensor\_\-test\_\-loop()}{p.}{sensor__interface_8c_a968d698da8cbcc1501216b600a7fef86} function. \item\end{DoxyCompactList}\item 
+\#define {\bf STANDALONE\_\-TEST}~[( 0 $|$ 1 )]\label{sensor__interface_8c_ad338485bb9393355e7ba3525374f5b6a}
+
+\begin{DoxyCompactList}\small\item\em Include \doxyref{main()}{p.}{main_8c_a6288eba0f8e8ad3ab1544ad731eb7667} loop for testing. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf DS1620 Interface Pins}\par
+{\em \label{_amgrp66b4c6fc94cd3f71d752301ed01c14e0}
+ 3-\/wire connection to the MCU Port }\begin{DoxyCompactItemize}
+\item 
+\#define {\bf TS\_\-DATA}~[( P0 $|$ P1 $|$ P2 $|$ P3 )]\label{sensor__interface_8c_a71ecbed0e8a28fdcb711ee5ff47281ff}
+
+\begin{DoxyCompactList}\small\item\em Data pin for DS1620 sensor chip. \item\end{DoxyCompactList}\item 
+\#define {\bf TS\_\-CLOCK}~[( P0 $|$ P1 $|$ P2 $|$ P3 )]\label{sensor__interface_8c_ad36b0605295807c16c760f74cfa14f21}
+
+\begin{DoxyCompactList}\small\item\em Clock pin for DS1620 sensor chip. \item\end{DoxyCompactList}\item 
+\#define {\bf TS\_\-RESET}~[( P0 $|$ P1 $|$ P2 $|$ P3 )]\label{sensor__interface_8c_a3311491b7efb2c6e645524155ffd940c}
+
+\begin{DoxyCompactList}\small\item\em Enable pin for DS1620 sensor chip. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf Macros}\par
+{\em \label{_amgrpa0e3947a02661e2385e4b76ab1b12f4d}
+ Very simplistic handy functions are implemented as macros. }\begin{DoxyCompactItemize}
+\item 
+\#define {\bf TS\_\-TICK}()~TS\_\-CLOCK = 0; TS\_\-CLOCK = 1\label{sensor__interface_8c_afd0cd950593eca89bc5a4aea791fa009}
+
+\begin{DoxyCompactList}\small\item\em Positive pulse on \doxyref{TS\_\-CLOCK}{p.}{sensor__interface_8c_ad36b0605295807c16c760f74cfa14f21}. \item\end{DoxyCompactList}\item 
+\#define {\bf TS\_\-STOP}()~TS\_\-RESET = 0\label{sensor__interface_8c_ab0997e7ed03f39401869496af6f812b2}
+
+\begin{DoxyCompactList}\small\item\em Pull \doxyref{TS\_\-RESET}{p.}{sensor__interface_8c_a3311491b7efb2c6e645524155ffd940c} low. \item\end{DoxyCompactList}\item 
+\#define {\bf TS\_\-START}()~TS\_\-RESET = 0; TS\_\-CLOCK = 1; TS\_\-RESET = 1\label{sensor__interface_8c_a4724da278d86bde918861650ad2d913a}
+
+\begin{DoxyCompactList}\small\item\em Pull \doxyref{TS\_\-RESET}{p.}{sensor__interface_8c_a3311491b7efb2c6e645524155ffd940c} low, \doxyref{TS\_\-CLOCK}{p.}{sensor__interface_8c_ad36b0605295807c16c760f74cfa14f21} high, and then \doxyref{TS\_\-RESET}{p.}{sensor__interface_8c_a3311491b7efb2c6e645524155ffd940c} high. \item\end{DoxyCompactList}\item 
+\#define {\bf TS\_\-SETUP}()
+\begin{DoxyCompactList}\small\item\em Basic DS1620 setup macro example. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\subsection*{Functions}
+\begin{Indent}{\bf Wait for 20 ms}\par
+{\em \label{_amgrp1414efacf6043ab69d24c2f5d2b295f0}
+This function is require when writing data to the {\ttfamily EEPROM} of the {\ttfamily DS1620} sensor chip.
+
+Implemented using either nested {\ttfamily for-\/loop} or inline assembly function (quote below). The MCU 8051 IDE provides delay loop calculator, which was used to generate the assembly code.
+
+The default behaviour is to use a nested for-\/loop. This behaviour can be changed using pre-\/processor constant USE\_\-ASM\_\-TS\_\-WAIT. Skelleton code had been also wirtten with different C compiler in mind.
+
+
+\begin{DoxyCode}
+ ; START: Wait loop, time: 20 us
+ ; Clock: 14745.6 kHz (12 / MC)
+ ; Used registers: R0
+ ; Rest: -889.6 ns
+ LOOP:
+        MOV     R0, #007h
+        NOP
+        DJNZ    R0, $
+        NOP
+        NOP
+\end{DoxyCode}
+ }\begin{DoxyCompactItemize}
+\item 
+void {\bf ts\_\-wait} (void)
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf Temperature Sensor Command}\par
+{\em \label{_amgrp73e8701deab7edf0d25492835f0d5e45}
+ 
+\begin{DoxyParams}{Parameters}
+\item[{\em byte}]-\/ 8-\/bit command to write.\end{DoxyParams}
+Writes a command byte (bit-\/by-\/bit) to the \doxyref{TS\_\-DATA}{p.}{sensor__interface_8c_a71ecbed0e8a28fdcb711ee5ff47281ff} pin, applying \doxyref{TS\_\-TICK()}{p.}{sensor__interface_8c_afd0cd950593eca89bc5a4aea791fa009} after each bit. Code line below performs the {\ttfamily \char`\"{}shift-\/right-\/AND-\/mask\char`\"{}} operation. 
+\begin{DoxyCode}
+ TS_DATA = ( bytes >> n ) & 0x01;
+\end{DoxyCode}
+ }\begin{DoxyCompactItemize}
+\item 
+void {\bf tsc} (char byte)
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf Temperature Sensor Query}\par
+{\em \label{_amgrp60e202f447b42000e503fd7700045191}
+This function implements all-\/in-\/one DS1620 sensor control. This is probably the most straight-\/ forward way of communicating with the sensor. Having multiple function is not considered to be of any particular use. The only helper function that is needed is \doxyref{tsc()}{p.}{sensor__interface_8c_a14cb5b83e39cb69ad481f33eb0756860}.
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em mode}]-\/ the command to operate (sets the mode) \item[{\em data}]-\/ value to write, pass '0' when reading \end{DoxyParams}
+}\begin{DoxyCompactItemize}
+\item 
+int {\bf tsq} (unsigned char mode, int data)
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf Temperature Sensor Setup}\par
+{\em \label{_amgrpaa4a24da62a1d95064de66b825b32852}
+Basic setup function }\begin{DoxyCompactItemize}
+\item 
+void {\bf sensor\_\-setup} (void)
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf Temperature Sensor Read}\par
+{\em \label{_amgrp4887ef1a0af1ed5daf5851b90549984c}
+Basic read function for data acquisition. }\begin{DoxyCompactItemize}
+\item 
+int {\bf sensor\_\-read} (void)
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf Sensor Test Loop}\par
+{\em \label{_amgrp7569e5225de380b4866b3d6e9d5ef7de}
+This is a loop intended for hardware tests. It can be disabled by setting constant \doxyref{TESTING\_\-FUNCTIONS}{p.}{sensor__interface_8c_ae0ae932a749d5795e43cc1346f62ac3e} to 0. }\begin{DoxyCompactItemize}
+\item 
+void {\bf sensor\_\-test\_\-loop} (unsigned char x)
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf Standalone Testing Function}\par
+{\em \label{_amgrpf4a329893de9b0055b356c21d0c5d5c3}
+The {\ttfamily \doxyref{main()}{p.}{main_8c_a6288eba0f8e8ad3ab1544ad731eb7667}} function is only compiled when \doxyref{STANDALONE\_\-TEST}{p.}{sensor__interface_8c_ad338485bb9393355e7ba3525374f5b6a} is set to 1. }\begin{DoxyCompactItemize}
+\item 
+void {\bf main} (void)
+\end{DoxyCompactItemize}
+\end{Indent}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+short int {\bf temp} = 0
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file implements {\ttfamily DS1620} digital temperature sensor driver. The information had been extracted from datasheets and code examples. The objective is to implement 3-\/wire communication protocol that uses 8-\/bit commands to query for measurement and configuration data, or storing new configuration. The data is of 9-\/bit length, with 9th bit to represent the sign, therefore some manipulation routines are required.
+
+  
+\begin{DoxyImage}
+\includegraphics{sensor_function_block_diagram.png}
+\caption{DS1620 Digital Thermometer and Thermostat (function block diagram)}
+\end{DoxyImage}
+ 
+\begin{DoxyImage}
+\includegraphics{sensor_interface.png}
+\caption{Virtual DS1620 in MCU 8051 IDE}
+\end{DoxyImage}
+ Some code has been borrowed from {\ttfamily DS1620} Arduino C++ Library:
+\begin{DoxyItemize}
+\item {\tt https://github.com/thinkhole/Arduino-\/DS1620/blob/master/ds1620.cpp}
+\end{DoxyItemize}However, after some consideration of how it would be used in the full context, a single multi-\/purpose function had been developer.
+
+For datasheet information see Dallas Semiconductors, Maxim Integrated Products:
+\begin{DoxyItemize}
+\item {\tt http://www.maxim-\/ic.com/quick\_\-view2.cfm/qv\_\-pk/2735}
+\item {\tt http://datasheets.maxim-\/ic.com/en/ds/DS1620.pdf}
+\end{DoxyItemize}\begin{DoxyAuthor}{Author}
+Ilya Dmitrichenko $<${\tt errordeveloper@gmail.com}$>$ 
+\end{DoxyAuthor}
+
+
+Definition in file {\bf sensor\_\-interface.c}.
+
+
+
+\subsection{Define Documentation}
+\index{sensor\_\-interface.c@{sensor\_\-interface.c}!WRITE\_\-DELAY@{WRITE\_\-DELAY}}
+\index{WRITE\_\-DELAY@{WRITE\_\-DELAY}!sensor_interface.c@{sensor\_\-interface.c}}
+\subsubsection[{WRITE\_\-DELAY}]{\setlength{\rightskip}{0pt plus 5cm}\#define WRITE\_\-DELAY~20}\label{sensor__interface_8c_ae5c06dba796c468f3d219d4850c7afa2}
+
+
+Time to wait (20 ms) after a {\ttfamily EEPROM} write. 
+
+This constant is not in use, see \doxyref{ts\_\-wait()}{p.}{sensor__interface_8c_a001ecaa7c9b63b3c2d7902d617eed418} . 
+
+Definition at line {\bf 87} of file {\bf sensor\_\-interface.c}.
+
+\index{sensor\_\-interface.c@{sensor\_\-interface.c}!TS\_\-CONF@{TS\_\-CONF}}
+\index{TS\_\-CONF@{TS\_\-CONF}!sensor_interface.c@{sensor\_\-interface.c}}
+\subsubsection[{TS\_\-CONF}]{\setlength{\rightskip}{0pt plus 5cm}\#define TS\_\-CONF~10}\label{sensor__interface_8c_aed64e63062d154da27a89624ba090138}
+
+
+Enables CPU-\/mode and disables single-\/shot-\/mode. 
+
+\begin{DoxySeeAlso}{See also}
+DS1620 datasheet for details 
+\end{DoxySeeAlso}
+
+
+Definition at line {\bf 90} of file {\bf sensor\_\-interface.c}.
+
+\index{sensor\_\-interface.c@{sensor\_\-interface.c}!TS\_\-SETUP@{TS\_\-SETUP}}
+\index{TS\_\-SETUP@{TS\_\-SETUP}!sensor_interface.c@{sensor\_\-interface.c}}
+\subsubsection[{TS\_\-SETUP}]{\setlength{\rightskip}{0pt plus 5cm}\#define TS\_\-SETUP(
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{sensor__interface_8c_ab8d9ac85e011ef0ef7ff3563a69c427e}
+{\bfseries Value:}
+\begin{DoxyCode}
+tsq(WRITE_TL, 15); \(\backslash\)
+tsq(WRITE_TH, 30); \(\backslash\)
+tsq(WRITE_CONF, TS_CONF); \(\backslash\)
+tsq(RUN_CONV, 0)
+\end{DoxyCode}
+
+
+Basic DS1620 setup macro example. 
+
+
+
+Definition at line {\bf 134} of file {\bf sensor\_\-interface.c}.
+
+
+
+\subsection{Function Documentation}
+\index{sensor\_\-interface.c@{sensor\_\-interface.c}!ts\_\-wait@{ts\_\-wait}}
+\index{ts\_\-wait@{ts\_\-wait}!sensor_interface.c@{sensor\_\-interface.c}}
+\subsubsection[{ts\_\-wait}]{\setlength{\rightskip}{0pt plus 5cm}void ts\_\-wait (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{sensor__interface_8c_a001ecaa7c9b63b3c2d7902d617eed418}
+
+
+Total run of nested for loops will be 50. 
+
+
+
+Definition at line {\bf 175} of file {\bf sensor\_\-interface.c}.
+
+\index{sensor\_\-interface.c@{sensor\_\-interface.c}!tsc@{tsc}}
+\index{tsc@{tsc}!sensor_interface.c@{sensor\_\-interface.c}}
+\subsubsection[{tsc}]{\setlength{\rightskip}{0pt plus 5cm}void tsc (
+\begin{DoxyParamCaption}
+\item[{char}]{ byte}
+\end{DoxyParamCaption}
+)}\label{sensor__interface_8c_a14cb5b83e39cb69ad481f33eb0756860}
+
+
+\begin{center}
+
+\begin{DoxyImageNoCaption}
+  \mbox{\includegraphics{inline_dotgraph_1}}
+\end{DoxyImageNoCaption}
+\end{center}
+
+
+
+
+Definition at line {\bf 222} of file {\bf sensor\_\-interface.c}.
+
+\index{sensor\_\-interface.c@{sensor\_\-interface.c}!tsq@{tsq}}
+\index{tsq@{tsq}!sensor_interface.c@{sensor\_\-interface.c}}
+\subsubsection[{tsq}]{\setlength{\rightskip}{0pt plus 5cm}int tsq (
+\begin{DoxyParamCaption}
+\item[{unsigned char}]{ mode, }
+\item[{int}]{ data}
+\end{DoxyParamCaption}
+)}\label{sensor__interface_8c_a254a45df9078e0535858f2fe547fe124}
+
+
+{\bfseries  Switch operation modes, depending on command: }
+
+
+\begin{DoxyItemize}
+\item Start or Stop conversion:
+\begin{DoxyItemize}
+\item Only send the command, namely \doxyref{RUN\_\-CONV}{p.}{sensor__interface_8c_a276eb00e22ed058d4b898973348424ad} or \doxyref{END\_\-CONV}{p.}{sensor__interface_8c_a9c2a143dfdf5d3644b0dc61c5ba66510}
+\item Will always return zero
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+
+\begin{DoxyItemize}
+\item Read 9-\/bit data for the fallowing commands:
+\begin{DoxyItemize}
+\item \doxyref{READ\_\-SLOPE}{p.}{sensor__interface_8c_adaf3f5870ee00760c021c8e4f20d63cc} or \doxyref{READ\_\-COUNT}{p.}{sensor__interface_8c_ad222baf9301d2d35a5c928a0d91c4335}
+\item \doxyref{READ\_\-TH}{p.}{sensor__interface_8c_a5146064cb3c944c28b8dbe6f8d7aa31b} or \doxyref{READ\_\-TL}{p.}{sensor__interface_8c_ac32d2ece473c8c8456f3b7de7d92f077}
+\item \doxyref{READ\_\-TEMP}{p.}{sensor__interface_8c_ac8c23082885adeec4834469b64e00bb9}
+\item {\itshape  The sequence is illustrated in the flow diagram \/}
+\end{DoxyItemize}\begin{center}
+
+\begin{DoxyImageNoCaption}
+  \mbox{\includegraphics{inline_dotgraph_2}}
+\end{DoxyImageNoCaption}
+\end{center}
+
+\end{DoxyItemize}
+
+As it can be see from the flow digaram, the procedure underneath this function is quite linear. Further bit manipulation is required for handling of negative value representation:
+
+
+\begin{DoxyCode}
+ temp = data & 0x00ff;
+
+ temp = 0x0100 - temp;
+
+ temp *= (short)-1;
+
+ \textcolor{keywordflow}{return} ( temp / 2 );
+\end{DoxyCode}
+
+
+The idea behind writing \doxyref{tsq()}{p.}{sensor__interface_8c_a254a45df9078e0535858f2fe547fe124} as one long function is to demonstrate the linearity and general nature of operation, as well optimising the size on the chip.
+
+
+\begin{DoxyItemize}
+\item Write 9-\/bit data for the \doxyref{WRITE\_\-TL}{p.}{sensor__interface_8c_a32dd3f772426c4f6c91c8226e016dae1} or \doxyref{WRITE\_\-TH}{p.}{sensor__interface_8c_a5d3ffdb2b80ee63715d3cf3795cbed59}
+\begin{DoxyItemize}
+\item Send command using tsc(mode)
+\item Multiply the data value by 2
+\item Write bits using \char`\"{}shift-\/right-\/AND-\/mask\char`\"{} operation
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+
+\begin{DoxyItemize}
+\item Write 8-\/bit data to the configuration register
+\end{DoxyItemize}
+
+
+\begin{DoxyItemize}
+\item Test case: return the data 
+\end{DoxyItemize}
+
+
+
+Definition at line {\bf 279} of file {\bf sensor\_\-interface.c}.
+
+\index{sensor\_\-interface.c@{sensor\_\-interface.c}!sensor\_\-setup@{sensor\_\-setup}}
+\index{sensor\_\-setup@{sensor\_\-setup}!sensor_interface.c@{sensor\_\-interface.c}}
+\subsubsection[{sensor\_\-setup}]{\setlength{\rightskip}{0pt plus 5cm}void sensor\_\-setup (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{sensor__interface_8c_ac4703fb2180cef6e9c87637e5c837c88}
+
+
+Use \doxyref{TS\_\-SETUP()}{p.}{sensor__interface_8c_ab8d9ac85e011ef0ef7ff3563a69c427e} macro.
+
+
+
+Definition at line {\bf 541} of file {\bf sensor\_\-interface.c}.
+
+\index{sensor\_\-interface.c@{sensor\_\-interface.c}!sensor\_\-read@{sensor\_\-read}}
+\index{sensor\_\-read@{sensor\_\-read}!sensor_interface.c@{sensor\_\-interface.c}}
+\subsubsection[{sensor\_\-read}]{\setlength{\rightskip}{0pt plus 5cm}int sensor\_\-read (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{sensor__interface_8c_aef2ea3b8bf8e02ffaefec5892411830d}
+
+
+Use \doxyref{tsq()}{p.}{sensor__interface_8c_a254a45df9078e0535858f2fe547fe124} to send READ\_\-TEMP command and 0 as the data value to specify 'read' mode.
+
+
+
+Definition at line {\bf 556} of file {\bf sensor\_\-interface.c}.
+
+\index{sensor\_\-interface.c@{sensor\_\-interface.c}!sensor\_\-test\_\-loop@{sensor\_\-test\_\-loop}}
+\index{sensor\_\-test\_\-loop@{sensor\_\-test\_\-loop}!sensor_interface.c@{sensor\_\-interface.c}}
+\subsubsection[{sensor\_\-test\_\-loop}]{\setlength{\rightskip}{0pt plus 5cm}void sensor\_\-test\_\-loop (
+\begin{DoxyParamCaption}
+\item[{unsigned char}]{ x}
+\end{DoxyParamCaption}
+)}\label{sensor__interface_8c_a968d698da8cbcc1501216b600a7fef86}
+
+
+Use \doxyref{TEST}{p.}{sensor__interface_8c_ab946e2e7f7679350627acfded8e2658b} command to check basic functionality.
+
+
+
+Definition at line {\bf 577} of file {\bf sensor\_\-interface.c}.
+
+\index{sensor\_\-interface.c@{sensor\_\-interface.c}!main@{main}}
+\index{main@{main}!sensor_interface.c@{sensor\_\-interface.c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}void main (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{sensor__interface_8c_a6288eba0f8e8ad3ab1544ad731eb7667}
+
+
+Run \doxyref{sensor\_\-test\_\-loop()}{p.}{sensor__interface_8c_a968d698da8cbcc1501216b600a7fef86} 2 times.
+
+
+
+Definition at line {\bf 600} of file {\bf sensor\_\-interface.c}.
+
+
+
+\subsection{Variable Documentation}
+\index{sensor\_\-interface.c@{sensor\_\-interface.c}!temp@{temp}}
+\index{temp@{temp}!sensor_interface.c@{sensor\_\-interface.c}}
+\subsubsection[{temp}]{\setlength{\rightskip}{0pt plus 5cm}short int {\bf temp} = 0}\label{sensor__interface_8c_a340d25b6df6923f05367de4da2fe186d}
+Gloabal temperature variable. 
+
+Definition at line {\bf 145} of file {\bf sensor\_\-interface.c}.
+

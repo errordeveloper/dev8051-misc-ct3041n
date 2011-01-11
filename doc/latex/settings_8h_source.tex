@@ -1,0 +1,47 @@
+\section{settings.h}
+
+\begin{DoxyCode}
+00014 \textcolor{preprocessor}{#if !DOXYGEN}
+00015 \textcolor{preprocessor}{}
+00016 \textcolor{preprocessor}{#define MAIN\_PROGRAM}
+00017 \textcolor{preprocessor}{}
+00018 \textcolor{comment}{/* Configure some options to compile.}
+00019 \textcolor{comment}{ * Including optimisation and debug.}
+00020 \textcolor{comment}{*/}
+00021 \textcolor{preprocessor}{#define TESTING\_FUNCTIONS       1}
+00022 \textcolor{preprocessor}{}\textcolor{preprocessor}{#define STANDALONE\_TEST         1}
+00023 \textcolor{preprocessor}{}
+00024 
+00025 \textcolor{comment}{/* Cofiguration of segment\_display.c}
+00026 \textcolor{comment}{*/}
+00027 
+00028 \textcolor{preprocessor}{#define BASIC\_METHOD            0}
+00029 \textcolor{preprocessor}{}
+00030 \textcolor{comment}{/* Configure which ports LED display is connected to.}
+00031 \textcolor{comment}{ * Use (P0), (P1), (P2) or (P3).}
+00032 \textcolor{comment}{*/}
+00033 \textcolor{preprocessor}{#define DIGIT           (P0)}
+00034 \textcolor{preprocessor}{}\textcolor{preprocessor}{#define SEGMENT         (P1)}
+00035 \textcolor{preprocessor}{}
+00036 \textcolor{comment}{/* Set the pin number to which the first}
+00037 \textcolor{comment}{ * digit (least significant) is connected.}
+00038 \textcolor{comment}{*/}
+00039 \textcolor{preprocessor}{#define FIRST\_DIGIT             (0)}
+00040 \textcolor{preprocessor}{}
+00041 \textcolor{comment}{/* Change the common pin setting.}
+00042 \textcolor{comment}{ * Use (ANODE) or (CATHODE).}
+00043 \textcolor{comment}{*/}
+00044 \textcolor{preprocessor}{#define COMMON\_PIN              ANODE}
+00045 \textcolor{preprocessor}{}
+00046 
+00047 \textcolor{comment}{/* Cofiguration of sensor\_interface.c}
+00048 \textcolor{comment}{*/}
+00049 
+00050 \textcolor{comment}{/* Configure which ports DS1620 sensor is connected to.}
+00051 \textcolor{comment}{ * Use (P0), (P1), (P2) or (P3).}
+00052 \textcolor{comment}{*/}
+00053 \textcolor{preprocessor}{#define TS\_DATA         (P2\_0)}
+00054 \textcolor{preprocessor}{}\textcolor{preprocessor}{#define TS\_CLOCK        (P2\_1)}
+00055 \textcolor{preprocessor}{}\textcolor{preprocessor}{#define TS\_RESET        (P2\_2)}
+00057 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

@@ -1,0 +1,56 @@
+\documentclass[a4paper]{book}
+\usepackage{a4wide}
+\usepackage{makeidx}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{textcomp}
+\usepackage{alltt}
+\usepackage{times}
+\usepackage[utf8]{inputenc}
+\usepackage{doxygen}
+\lstset{language=C++,inputencoding=utf8,basicstyle=\footnotesize,breaklines=true,breakatwhitespace=true,tabsize=8,numbers=left }
+\makeindex
+\setcounter{tocdepth}{3}
+\renewcommand{\footrulewidth}{0.4pt}
+\begin{document}
+\begin{titlepage}
+\vspace*{7cm}
+\begin{center}
+{\Large Embedded Systems Case Sudy }\\
+
+\vspace*{1cm}
+{\large Ilya Dmitrichenko}\\
+
+\vspace*{0.5cm}
+{\small January 2011}\\
+
+\vspace*{0.7cm}
+{\small LMU CT3041}\\
+
+\end{center}
+\end{titlepage}
+%\clearemptydoublepage
+\pagenumbering{roman}
+\tableofcontents
+%\clearemptydoublepage
+\pagenumbering{arabic}
+\chapter{Emebedded Systems Case Study}
+\label{index}\input{index}
+\chapter{File Index}
+\input{files}
+\chapter{File Documentation}
+\input{main_8c}
+\input{main_8c_source}
+\input{prototypes_8h}
+\input{prototypes_8h_source}
+\input{segment__display_8c}
+\input{segment__display_8c_source}
+\input{sensor__interface_8c}
+\input{sensor__interface_8c_source}
+\input{settings_8h}
+\input{settings_8h_source}
+\printindex
+\end{document}

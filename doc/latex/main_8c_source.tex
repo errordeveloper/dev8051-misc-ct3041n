@@ -1,0 +1,30 @@
+\section{main.c}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{comment}{/* Doxygen tagged comments were stripped. */}
+00008 
+00080 \textcolor{preprocessor}{#ifdef SDCC}
+00081 \textcolor{preprocessor}{}\textcolor{preprocessor}{#include <at89x51.h>}
+00082 \textcolor{preprocessor}{#else}
+00083 \textcolor{preprocessor}{}\textcolor{preprocessor}{#include <reg51.h>}
+00084 \textcolor{preprocessor}{#endif}
+00085 \textcolor{preprocessor}{}
+00086 \textcolor{preprocessor}{#include "settings.h"}
+00087 \textcolor{preprocessor}{#include "prototypes.h"}
+00088 
+00089 \textcolor{keywordtype}{void} main ( \textcolor{keywordtype}{void} )
+00090 \{
+00091 
+00098   sensor_setup();
+00099 
+00106   \textcolor{keywordflow}{while}(1) \{
+00107 
+00108     display_number( sensor_read() );
+00109 
+00110     \textcolor{comment}{/* READ\_DELAY(); */}
+00111 
+00112   \}
+00113 
+00114 \}
+\end{DoxyCode}
